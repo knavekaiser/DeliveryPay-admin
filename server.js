@@ -48,7 +48,7 @@ global.notify = (client, body, clientType) => {
 const publicVapidKey = process.env.PUBLIC_VAPID_KEY;
 const privateVapidKey = process.env.PRIVATE_VAPID_KEY;
 webPush.setVapidDetails(
-  "mailto:support@schoolforblinds.com",
+  "mailto:support@deliverypay.in",
   publicVapidKey,
   privateVapidKey
 );
@@ -236,7 +236,7 @@ app.get("*", (req, res) =>
 const socketIO = require("socket.io");
 global.io = socketIO(
   app.listen(PORT, () => {
-    console.log("skropay-admin backend listening to port:", PORT);
+    console.log("Delivery Pay - admin backend listening to port:", PORT);
   })
 );
 

@@ -94,6 +94,9 @@ app.patch(
       const loser = plaintiff._id.toString() !== winner ? plaintiff : defendant;
       const winnerDetail =
         plaintiff._id.toString() === winner ? plaintiff : defendant;
+      const disputeForRefund = dispute.plaintiff._id === milestone.buyer._id;
+      const buyerWins = milestone.buyer._id.toString() === winner;
+      const sellerWins = milestone.seller._id.toString() === winner;
       if (loser.balance > milestone.amount) {
         Promise.all([
           new Transaction({
@@ -114,60 +117,124 @@ app.patch(
                   ).then((user) => (user ? transaction : null))
                 : null
             ),
-          new P2PTransaction({
-            user: winner,
-            milestoneId: milestone._id,
-            amount: milestone.amount,
-            client: {
-              _id: loser._id,
-              firstName: loser.firstName,
-              lastName: loser.lastName,
-              phone: loser.phone,
-              email: loser.email,
-            },
-            note: "milestone refund",
-          })
-            .save()
-            .then((transaction) =>
-              transaction
-                ? User.findOneAndUpdate(
-                    { _id: winner },
-                    {
-                      $inc: { balance: transaction.amount },
-                      $addToSet: { transactions: transaction._id },
-                    },
-                    { new: true }
-                  )
-                : null
-            ),
-          new P2PTransaction({
-            user: loser._id,
-            milestoneId: milestone._id,
-            amount: -milestone.amount,
-            client: {
-              _id: winner,
-              firstName: winnerDetail.firstName,
-              lastName: winnerDetail.lastName,
-              phone: winnerDetail.phone,
-              email: winnerDetail.email,
-            },
-            note: "milestone refund",
-          })
-            .save()
-            .then((transaction) =>
-              transaction
-                ? User.findOneAndUpdate(
-                    { _id: loser._id },
-                    {
-                      $inc: { balance: -transaction.amount },
-                      $addToSet: { transactions: transaction._id },
-                    },
-                    { new: true }
-                  )
-                : null
-            ),
-        ]).then(([transaction, winner, loser]) => {
-          if (transaction && winner && loser) {
+          ...(disputeForRefund && buyerWins
+            ? [
+                new P2PTransaction({
+                  user: winner,
+                  milestoneId: milestone._id,
+                  amount: milestone.amount,
+                  client: {
+                    _id: loser._id,
+                    firstName: loser.firstName,
+                    lastName: loser.lastName,
+                    phone: loser.phone,
+                    email: loser.email,
+                  },
+                  note: "milestone refund",
+                })
+                  .save()
+                  .then((transaction) =>
+                    transaction
+                      ? User.findOneAndUpdate(
+                          { _id: winner },
+                          {
+                            $inc: { balance: transaction.amount },
+                            $addToSet: { transactions: transaction._id },
+                          },
+                          { new: true }
+                        )
+                      : null
+                  ),
+                new P2PTransaction({
+                  user: loser._id,
+                  milestoneId: milestone._id,
+                  amount: -milestone.amount,
+                  client: {
+                    _id: winner,
+                    firstName: winnerDetail.firstName,
+                    lastName: winnerDetail.lastName,
+                    phone: winnerDetail.phone,
+                    email: winnerDetail.email,
+                  },
+                  note: "milestone refund",
+                })
+                  .save()
+                  .then((transaction) =>
+                    transaction
+                      ? User.findOneAndUpdate(
+                          { _id: loser._id },
+                          {
+                            $inc: { balance: -transaction.amount },
+                            $addToSet: { transactions: transaction._id },
+                          },
+                          { new: true }
+                        )
+                      : null
+                  ),
+              ]
+            : []),
+          ...(!disputeForRefund && sellerWins
+            ? [
+                new P2PTransaction({
+                  user: winner,
+                  milestoneId: milestone._id,
+                  amount: milestone.amount,
+                  client: {
+                    _id: loser._id,
+                    firstName: loser.firstName,
+                    lastName: loser.lastName,
+                    phone: loser.phone,
+                    email: loser.email,
+                  },
+                  note: "milestone refund",
+                })
+                  .save()
+                  .then((transaction) =>
+                    transaction
+                      ? User.findOneAndUpdate(
+                          { _id: winner },
+                          {
+                            $inc: { balance: transaction.amount },
+                            $addToSet: { transactions: transaction._id },
+                          },
+                          { new: true }
+                        )
+                      : null
+                  ),
+              ]
+            : []),
+          ...(!disputeForRefund && buyerWins
+            ? [
+                new P2PTransaction({
+                  user: winner,
+                  milestoneId: milestone._id,
+                  amount: milestone.amount,
+                  client: {
+                    _id: loser._id,
+                    firstName: loser.firstName,
+                    lastName: loser.lastName,
+                    phone: loser.phone,
+                    email: loser.email,
+                  },
+                  note: "milestone refund",
+                })
+                  .save()
+                  .then((transaction) =>
+                    transaction
+                      ? User.findOneAndUpdate(
+                          { _id: winner },
+                          {
+                            $inc: { balance: transaction.amount },
+                            $addToSet: { transactions: transaction._id },
+                          },
+                          { new: true }
+                        )
+                      : null
+                  ),
+              ]
+            : []),
+        ]).then((dbRes) => {
+          if (dbRes[0]) {
             Dispute.findOneAndUpdate(
               { _id },
               {
@@ -177,7 +244,7 @@ app.patch(
               { new: true }
             ).then((dispute) => {
               InitiateChat({
-                user: winner._id,
+                user: winnerDetail._id,
                 client: loser._id,
               })
                 .then(([userChat, clientChat]) => {
@@ -185,7 +252,7 @@ app.patch(
                     rooms: [userChat._id, clientChat._id],
                     message: {
                       type: "dispute",
-                      from: winner._id,
+                      from: winnerDetail._id,
                       to: loser._id,
                       text: `${winner.firstName} winned a dispute.`,
                     },

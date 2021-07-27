@@ -135,26 +135,3 @@ const OTPModel = new Schema(
   { timestamp: true }
 );
 global.OTP = mongoose.model("OTP", OTPModel);
-
-const contactUsModel = new Schema(
-  {
-    name: { type: String, required: true },
-    phone: { type: String },
-    email: { type: String },
-    message: { type: String, required: true },
-  },
-  { timestamps: true }
-);
-global.ContactUs = mongoose.model("ContactUs", contactUsModel);
-
-const workRequestModel = new Schema(
-  {
-    firstName: { type: String, required: true, trim: true },
-    lastName: { type: String, required: true, trim: true },
-    email: { type: String },
-    phone: { type: String },
-    dscr: { type: String, required: true },
-  },
-  { timestamps: true }
-);
-global.WorkRequest = mongoose.model("WorkRequest", workRequestModel);

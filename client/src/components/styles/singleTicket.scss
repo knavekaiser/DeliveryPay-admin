@@ -1,0 +1,146 @@
+$blue: #336cf9;
+$green: #1be6d6;
+$pink: #f64bbd;
+$red: #ff5757;
+$lightBlue: #e7f6fc;
+
+.ticket {
+  display: grid;
+  grid-template-columns: 18rem 1fr;
+  height: 100%;
+  grid-gap: 0.5rem;
+  max-height: calc(100% - 80px);
+  padding: 0 1rem !important;
+  .detail {
+    .back {
+      position: sticky;
+      background: $lightBlue;
+      top: -1rem;
+      padding: 0.5rem 1rem;
+      display: flex;
+      align-items: center;
+      grid-gap: 0.5rem;
+    }
+    padding: 1rem 0.5rem;
+    overflow: auto;
+    display: grid;
+    grid-auto-rows: min-content;
+    grid-gap: 0.7rem;
+    .summery,
+    .milestoneDetail,
+    .transactionDetail {
+      border-radius: 0.5rem;
+      overflow: hidden;
+      box-shadow: 0 0 0.5rem rgba(0, 0, 0, 0.13);
+      padding-bottom: 1rem;
+      .head {
+        font-weight: 500;
+        padding: 1rem;
+        background: linear-gradient(
+          348deg,
+          rgba(2, 0, 36, 0) 0%,
+          rgba($red, 0.79) 100%
+        );
+      }
+      li {
+        padding: 0.5rem 1rem;
+        align-items: center;
+        grid-gap: 0.5rem;
+        label {
+          font-size: 0.8rem;
+          color: rgba(0, 0, 0, 0.5);
+        }
+      }
+      .placeholder {
+        color: rgba(0, 0, 0, 0.5);
+        font-style: italic;
+        padding-top: 1rem;
+      }
+    }
+    .pBtm {
+      height: 0.5rem;
+    }
+    &::-webkit-scrollbar {
+      display: none;
+    }
+  }
+  .messages {
+    border: 1px solid rgba(0, 0, 0, 0.18);
+    border-radius: 0.7rem;
+    overflow: auto;
+    margin-top: 1rem;
+    height: calc(100% - 2rem);
+    .head {
+      position: sticky;
+      top: 0;
+      padding: 1rem 0.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-weight: 500;
+      padding: 0.5rem 1rem;
+      background: white;
+      background-image: linear-gradient(
+        348deg,
+        rgba(2, 0, 36, 0) 0%,
+        rgba($green, 0.79) 100%
+      );
+      button {
+        font-weight: 600;
+        padding: 0.7rem 1.5rem;
+        border: none;
+        outline: none;
+        color: white;
+        font-size: 1rem;
+        border-radius: 2rem;
+        background: linear-gradient(
+          348deg,
+          rgba(black, 1) -50%,
+          rgba($blue, 0.79) 100%
+        );
+        cursor: pointer;
+        &:hover {
+          background: white;
+          color: $blue;
+          box-shadow: inset 0 0 0 2px $blue;
+        }
+      }
+    }
+    ul {
+      padding: 1rem;
+      display: flex;
+      grid-gap: 0.5rem;
+      flex-direction: column-reverse;
+      li {
+        border-radius: 0.5rem;
+        border: 1px solid rgba(0, 0, 0, 0.1);
+        .user {
+          padding: 0.7rem 1rem;
+          .name {
+            text-transform: capitalize;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            grid-column-gap: 0.5rem;
+            .role,
+            .date {
+              font-size: 0.8rem;
+              color: rgba(0, 0, 0, 0.5);
+            }
+            .date {
+              flex-basis: 100%;
+            }
+          }
+          border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+        }
+        .message {
+          padding: 0.7rem 1rem;
+        }
+        .files {
+          border-top: 1px solid rgba(0, 0, 0, 0.1);
+          padding: 0.7rem 1rem;
+        }
+      }
+    }
+  }
+}

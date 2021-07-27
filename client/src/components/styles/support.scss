@@ -1,0 +1,171 @@
+$blue: #336cf9;
+$red: #fc0660;
+$pink: #f64bbd;
+
+.formModal {
+  border-radius: 0.7rem;
+  width: 100%;
+  display: grid;
+  overflow: auto;
+  .head {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background: white;
+    display: flex;
+    justify-content: space-between;
+    padding: 1.3rem;
+    box-shadow: 0 0 0.7rem rgba(0, 0, 0, 0.25);
+    border-radius: 0.7rem 0.7rem 0 0;
+    .modalName {
+      color: $blue;
+      font-weight: 500;
+    }
+    button {
+      border: none;
+      outline: none;
+      background: none;
+      cursor: pointer;
+    }
+  }
+  form {
+    flex-wrap: wrap;
+    padding: 1.5rem;
+    display: grid;
+    grid-gap: 1.5rem;
+    .pBtm {
+      height: 1px;
+      flex-basis: 1;
+    }
+    section {
+      label {
+        display: block;
+        font-size: 0.8rem;
+        color: rgba(0, 0, 0, 0.7);
+      }
+      input,
+      textarea {
+        font-size: 1rem;
+        width: 100%;
+        border: none;
+        outline: none;
+        padding: 0.5rem 0;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.3);
+        &:focus {
+          border-color: $blue;
+        }
+        resize: none;
+      }
+    }
+    button {
+      width: max-content;
+      padding: 0.7rem 2.5rem;
+      border: none;
+      color: white;
+      margin: auto;
+      margin-top: 2rem;
+      border-radius: 2rem;
+      cursor: pointer;
+      &.submit {
+        background: linear-gradient(139deg, $blue 0%, rgb(11, 26, 69) 150%);
+        &:hover {
+          font-weight: bold;
+          color: $blue;
+          background: none;
+          box-shadow: inset 0 0 0 2px $blue;
+        }
+      }
+      &.cancel {
+        background: linear-gradient(139deg, $blue -20%, $pink 120%);
+        &:hover {
+          font-weight: bold;
+          color: $pink;
+          background: none;
+          box-shadow: inset 0 0 0 2px $pink;
+        }
+      }
+    }
+  }
+}
+
+.faqForm {
+  max-width: 40rem;
+  form {
+    .ans {
+      textarea {
+        min-height: 10rem;
+      }
+    }
+    button {
+      margin: auto;
+      margin-right: 0;
+    }
+  }
+}
+
+.formModal.faq {
+  max-width: 40rem;
+  .content {
+    padding: 1.5rem;
+    display: grid;
+    grid-gap: 2rem;
+    h3 {
+      font-size: 1.3rem;
+      font-weight: 400;
+      color: $blue;
+    }
+    .author {
+      display: flex;
+      grid-gap: 0.75rem;
+      align-items: center;
+      img {
+        height: 3rem;
+        width: 3rem;
+        border-radius: 50%;
+        object-fit: cover;
+      }
+      .name {
+        text-transform: capitalize;
+        .phone {
+          display: block;
+          font-size: 0.8rem;
+          color: rgba(0, 0, 0, 0.5);
+        }
+      }
+    }
+    .actions {
+      margin: auto;
+      margin-right: 0;
+      display: flex;
+      grid-gap: 1rem;
+      button {
+        width: max-content;
+        padding: 0.7rem 2.5rem;
+        border: none;
+        color: white;
+        border-radius: 2rem;
+        cursor: pointer;
+        font-weight: bold;
+        &.edit {
+          background: linear-gradient(139deg, $blue 0%, rgb(11, 26, 69) 150%);
+          &:hover {
+            color: $blue;
+            background: none;
+            box-shadow: inset 0 0 0 2px $blue;
+          }
+        }
+        &.delete {
+          background: linear-gradient(139deg, $blue -20%, $pink 120%);
+          &:hover {
+            color: $pink;
+            background: none;
+            box-shadow: inset 0 0 0 2px $pink;
+          }
+        }
+      }
+    }
+  }
+}
+.formModal.ticketReplyFormModal {
+  max-width: 40rem;
+}

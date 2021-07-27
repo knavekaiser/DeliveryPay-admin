@@ -1,0 +1,27 @@
+{
+  "files": {
+    "main.css": "/static/css/main.d08455c8.chunk.css",
+    "main.js": "/static/js/main.2692f07a.chunk.js",
+    "main.js.map": "/static/js/main.2692f07a.chunk.js.map",
+    "runtime-main.js": "/static/js/runtime-main.79a6aa11.js",
+    "runtime-main.js.map": "/static/js/runtime-main.79a6aa11.js.map",
+    "static/css/2.c2e18bb2.chunk.css": "/static/css/2.c2e18bb2.chunk.css",
+    "static/js/2.e5a3ebc7.chunk.js": "/static/js/2.e5a3ebc7.chunk.js",
+    "static/js/2.e5a3ebc7.chunk.js.map": "/static/js/2.e5a3ebc7.chunk.js.map",
+    "static/js/3.33a8ede6.chunk.js": "/static/js/3.33a8ede6.chunk.js",
+    "static/js/3.33a8ede6.chunk.js.map": "/static/js/3.33a8ede6.chunk.js.map",
+    "index.html": "/index.html",
+    "static/css/2.c2e18bb2.chunk.css.map": "/static/css/2.c2e18bb2.chunk.css.map",
+    "static/css/main.d08455c8.chunk.css.map": "/static/css/main.d08455c8.chunk.css.map",
+    "static/js/2.e5a3ebc7.chunk.js.LICENSE.txt": "/static/js/2.e5a3ebc7.chunk.js.LICENSE.txt",
+    "static/media/tick.71f1b4df.svg": "/static/media/tick.71f1b4df.svg",
+    "static/media/tick_border.30a56233.svg": "/static/media/tick_border.30a56233.svg"
+  },
+  "entrypoints": [
+    "static/js/runtime-main.79a6aa11.js",
+    "static/css/2.c2e18bb2.chunk.css",
+    "static/js/2.e5a3ebc7.chunk.js",
+    "static/css/main.d08455c8.chunk.css",
+    "static/js/main.2692f07a.chunk.js"
+  ]
+}

@@ -12,6 +12,7 @@ require("./models/user");
 require("./models/dispute");
 require("./models/payment");
 require("./models/chat");
+require("./models/support");
 require("dotenv").config();
 const PORT = process.env.PORT || 3002;
 const URI = process.env.MONGO_URI;
@@ -106,6 +107,8 @@ app.get(
 require("./routes/admin.js");
 require("./routes/disputes.js");
 require("./routes/chats.js");
+require("./routes/data.js");
+require("./routes/support.js");
 
 app.get(
   "/api/viewAllContactUs",

@@ -1,9 +1,82 @@
 app.get("/api/disputes", passport.authenticate("adminPrivate"), (req, res) => {
-  const { status, page, perPage } = req.query;
+  const { status, page, perPage, sort, order, dateFrom, dateTo } = req.query;
   const query = {
     ...(status && { status }),
+    ...(dateFrom &&
+      dateTo && {
+        createdAt: {
+          $gte: new Date(dateFrom),
+          $lt: new Date(dateTo),
+        },
+      }),
+  };
+  const sortOrder = {
+    [sort || "createdAt"]: order === "asc" ? 1 : -1,
   };
   Dispute.aggregate([
+    {
+      $lookup: {
+        from: "users",
+        let: {
+          plaintiff: "$plaintiff._id",
+        },
+        as: "plainProfile",
+        pipeline: [
+          { $match: { $expr: { $eq: ["$_id", "$$plaintiff"] } } },
+          {
+            $project: {
+              firstName: 1,
+              lastName: 1,
+              phone: 1,
+              email: 1,
+              profileImg: 1,
+            },
+          },
+        ],
+      },
+    },
+    {
+      $lookup: {
+        from: "users",
+        let: {
+          defendant: "$defendant._id",
+        },
+        as: "defProfile",
+        pipeline: [
+          { $match: { $expr: { $eq: ["$_id", "$$defendant"] } } },
+          {
+            $project: {
+              firstName: 1,
+              lastName: 1,
+              phone: 1,
+              email: 1,
+              profileImg: 1,
+            },
+          },
+        ],
+      },
+    },
+    {
+      $set: {
+        plaintiff: {
+          $mergeObjects: [
+            "$plaintiff",
+            {
+              $first: "$plainProfile",
+            },
+          ],
+        },
+        defendant: {
+          $mergeObjects: [
+            "$defendant",
+            {
+              $first: "$defProfile",
+            },
+          ],
+        },
+      },
+    },
+    { $unset: ["plainProfile", "defProfile"] },
     {
       $match: query,
     },
@@ -23,6 +96,29 @@ app.get("/api/disputes", passport.authenticate("adminPrivate"), (req, res) => {
       },
     },
     {
+      $set: {
+        "plaintiff.role": {
+          $cond: {
+            if: {
+              $eq: ["$milestoneId.seller._id", "$plaintiff._id"],
+            },
+            then: "seller",
+            else: "buyer",
+          },
+        },
+        "defendant.role": {
+          $cond: {
+            if: {
+              $eq: ["$milestoneId.seller._id", "$defendant._id"],
+            },
+            then: "seller",
+            else: "buyer",
+          },
+        },
+      },
+    },
+    { $sort: sortOrder },
+    {
       $facet: {
         disputes: [
           { $skip: +perPage * (+(page || 1) - 1) },
@@ -33,7 +129,7 @@ app.get("/api/disputes", passport.authenticate("adminPrivate"), (req, res) => {
     },
   ])
     .then((dbRes) => {
-      res.json(dbRes[0]);
+      res.json({ code: "ok", disputes: dbRes[0] });
     })
     .catch((err) => {
       console.log(err);
@@ -45,12 +141,132 @@ app.get(
   passport.authenticate("adminPrivate"),
   (req, res) => {
     const { _id } = req.query;
-    if (_id) {
-      Dispute.findOne({ _id: req.query._id })
-        .populate("milestoneId")
-        .then((dbRes) => {
-          res.json({ code: "ok", dispute: dbRes });
-        });
+    if (ObjectId.isValid(_id)) {
+      Dispute.aggregate([
+        {
+          $match: {
+            _id: new ObjectId(_id),
+          },
+        },
+        {
+          $lookup: {
+            from: "users",
+            let: {
+              plaintiff: "$plaintiff._id",
+            },
+            as: "plainProfile",
+            pipeline: [
+              {
+                $match: {
+                  $expr: {
+                    $eq: ["$_id", "$$plaintiff"],
+                  },
+                },
+              },
+              {
+                $project: {
+                  firstName: 1,
+                  lastName: 1,
+                  phone: 1,
+                  email: 1,
+                  profileImg: 1,
+                  balance: 1,
+                },
+              },
+            ],
+          },
+        },
+        {
+          $lookup: {
+            from: "users",
+            let: {
+              defendant: "$defendant._id",
+            },
+            as: "defProfile",
+            pipeline: [
+              {
+                $match: {
+                  $expr: {
+                    $eq: ["$_id", "$$defendant"],
+                  },
+                },
+              },
+              {
+                $project: {
+                  firstName: 1,
+                  lastName: 1,
+                  phone: 1,
+                  email: 1,
+                  profileImg: 1,
+                  balance: 1,
+                },
+              },
+            ],
+          },
+        },
+        {
+          $lookup: {
+            from: "milestones",
+            localField: "milestoneId",
+            foreignField: "_id",
+            as: "milestone",
+          },
+        },
+        {
+          $set: {
+            plaintiff: {
+              $mergeObjects: [
+                "$plaintiff",
+                {
+                  $first: "$plainProfile",
+                },
+              ],
+            },
+            defendant: {
+              $mergeObjects: [
+                "$defendant",
+                {
+                  $first: "$defProfile",
+                },
+              ],
+            },
+            milestone: {
+              $first: "$milestone",
+            },
+          },
+        },
+        {
+          $unset: ["plainProfile", "defProfile", "milestoneId"],
+        },
+        {
+          $set: {
+            "plaintiff.role": {
+              $cond: {
+                if: {
+                  $eq: ["$milestone.seller._id", "$plaintiff._id"],
+                },
+                then: "seller",
+                else: "buyer",
+              },
+            },
+            "defendant.role": {
+              $cond: {
+                if: {
+                  $eq: ["$milestone.seller._id", "$defendant._id"],
+                },
+                then: "seller",
+                else: "buyer",
+              },
+            },
+          },
+        },
+      ]).then((dbRes) => {
+        if (dbRes.length) {
+          res.json({ code: "ok", dispute: dbRes[0] });
+        } else {
+          res.json({ code: 400, message: "Dispute could not be found" });
+        }
+      });
     } else {
       res
         .status(400)
@@ -66,7 +282,7 @@ app.patch(
     if (_id && winner) {
       const [dispute, milestone, plaintiff, defendant] = await Dispute.findOne({
         _id,
-        status: "inProgress",
+        status: "pendingVerdict",
       })
         .populate("milestoneId", "buyer seller amount")
         .then(async (dispute) => {
@@ -87,8 +303,12 @@ app.patch(
             return [];
           }
         });
-      if (!dispute) {
-        res.status(400).json({ code: 400, message: "dispute does not exist" });
+      if (!dispute || !milestone || !plaintiff || !defendant) {
+        res.status(400).json({
+          code: 400,
+          message:
+            "1 of Dispute, Milestone, Plaintiff, Defendant does not exist",
+        });
         return;
       }
       const loser = plaintiff._id.toString() !== winner ? plaintiff : defendant;
@@ -254,7 +474,7 @@ app.patch(
                       type: "dispute",
                       from: winnerDetail._id,
                       to: loser._id,
-                      text: `${winner.firstName} winned a dispute.`,
+                      text: `${winnerDetail.firstName} winned a dispute.`,
                     },
                   });
                 })
@@ -287,7 +507,7 @@ app.patch(
       } else {
         res.json({
           code: 400,
-          message: "loser balance is low, can't refund milestone.",
+          message: "loser's balance is low, can't refund milestone.",
         });
       }
     } else {

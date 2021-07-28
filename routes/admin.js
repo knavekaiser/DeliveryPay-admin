@@ -232,11 +232,35 @@ app.post("/api/sendAdminForgotPassOTP", async (req, res) => {
       .save()
       .then((dbRes) => {
         if (dbRes) {
-          // send text massage or email here
-          res.json({
-            code: "ok",
-            message: "6 digit code has been sent, enter it within 2 minutes",
-          });
+          if (email) {
+            sendEmail({
+              from: {
+                name: "Delivery Pay Support",
+                address: "support@deliverypay.in",
+              },
+              to: email,
+              subject: "Delivery Pay password recovery",
+              text: `Hello,\nYour password reset code is ${code}. \nDelivery Pay.`,
+            })
+              .then((emailRes) => {
+                console.log(dbRes);
+                res.json({
+                  message:
+                    "6 digit code has been sent, enter it within 2 minutes",
+                });
+              })
+              .catch((err) => {
+                console.log(err);
+                res
+                  .status(500)
+                  .json({ code: 500, message: "Could not send Email" });
+              });
+          } else if (true) {
+            // send text massage or email here
+            res.json({
+              message: "6 digit code has been sent, enter it within 2 minutes",
+            });
+          }
         } else {
           res.status(500).json({ code: 500, message: "database error" });
         }

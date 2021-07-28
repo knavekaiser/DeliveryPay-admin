@@ -1,7 +1,15 @@
-import { useState, useRef, useLayoutEffect, useEffect } from "react";
+import {
+  useState,
+  useRef,
+  useLayoutEffect,
+  useEffect,
+  useContext,
+} from "react";
+import { SiteContext } from "../SiteContext";
 import tick from "../tick.svg";
 import tick_border from "../tick_border.svg";
 import { Modal } from "./Modal";
+import { Link, useHistory } from "react-router-dom";
 require("./styles/elements.scss");
 
 export const Err_svg = () => {
@@ -965,5 +973,54 @@ export const Paginaiton = ({
         {">"}
       </button>
     </div>
+  );
+};
+
+export const Header = () => {
+  const { user, setUser } = useContext(SiteContext);
+  const history = useHistory();
+  return (
+    <header>
+      <Link className="logoLink" to="/">
+        <img className="logo" src="/logo_land.jpg" alt="Delivery pay logo" />
+      </Link>
+      <div className="clas">
+        {
+          //   user ? (
+          //   <Link to="/account/home">Dashboard</Link>
+          // ) : (
+          //   <>
+          //     {history.location.pathname === "/u/login" ? (
+          //       <Link to="/u/join">Register</Link>
+          //     ) : (
+          //       <Link to="/u/login">Login</Link>
+          //     )}
+          //   </>
+          // )
+        }
+      </div>
+    </header>
+  );
+};
+export const Footer = () => {
+  return (
+    <footer>
+      <div className="links">
+        <a href="https://deliverypay.in/aboutUs">About us</a>
+        <a href="https://deliverypay.in/privacyPolicy">Privacy Policy</a>
+        <a href="https://deliverypay.in/codeOfConduct">Code of Conduct</a>
+        <a href="https://deliverypay.in/copyrightPolicy">Copyright Policy</a>
+        <a href="https://deliverypay.in/fees&Charges">Fees & Charges</a>
+        <a href="https://deliverypay.in/terms">User Agreement</a>
+        <a href="https://deliverypay.in/howItWorks">How it works</a>
+        <a href="https://deliverypay.in/contactUs">Contact us</a>
+        <a href="https://deliverypay.in/refundCancellationPolicy">
+          Refund & Cancellation Policy
+        </a>
+        <a href="https://deliverypay.in/shippingDeliveryPolicy">
+          Shipping & Delivery Policy
+        </a>
+      </div>
+    </footer>
   );
 };

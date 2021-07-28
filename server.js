@@ -14,6 +14,7 @@ require("./models/payment");
 require("./models/chat");
 require("./models/support");
 require("dotenv").config();
+require("./mailService");
 const PORT = process.env.PORT || 3002;
 const URI = process.env.MONGO_URI;
 const Razorpay = require("razorpay");

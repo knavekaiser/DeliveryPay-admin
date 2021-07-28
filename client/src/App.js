@@ -8,6 +8,7 @@ import {
   Link,
   useHistory,
 } from "react-router-dom";
+import { Header, Footer } from "./components/Elements";
 import { Modal } from "./components/Modal";
 import UserStart from "./components/UserStart";
 import Dashboard from "./components/Dashboard";
@@ -50,7 +51,19 @@ function App() {
       <BrowserRouter>
         <Switch>
           <ProtectedRoute path="/dashboard" component={Dashboard} />
-          <Route path="/" component={UserStart} />
+          <Route exact path="/" component={UserStart} />
+          <Route exact path="/login" component={UserStart} />
+          <Route exact path="/join" component={UserStart} />
+          <Route exact path="/resetPassword" component={UserStart} />
+          <Route path="/">
+            <div className="generic">
+              <Header />
+              <div className="fourFour">
+                <h1>404</h1>
+              </div>
+              <Footer />
+            </div>
+          </Route>
         </Switch>
       </BrowserRouter>
     </div>

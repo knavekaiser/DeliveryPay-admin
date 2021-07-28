@@ -1,7 +1,7 @@
 import { useState, useEffect, useContext, useRef } from "react";
 import { SiteContext } from "../SiteContext";
 import { Route, Switch, useHistory, useLocation, Link } from "react-router-dom";
-import { Checkbox } from "./Elements";
+import { Checkbox, Header, Footer } from "./Elements";
 import { GoogleLogin } from "react-google-login";
 require("./styles/userStart.scss");
 
@@ -53,10 +53,13 @@ const RegisterForm = () => {
       <img
         className="logo"
         onClick={() => history.push("")}
-        src="/logo_land.jpg"
+        src="/logo_benner.jpg"
         alt="Delivery pay logo"
       />
       <p className="title">Register as Admin</p>
+      <p className="links">
+        Already have an account? <Link to="/login">Login</Link>
+      </p>
       <form onSubmit={submit}>
         <input
           type="text"
@@ -66,17 +69,19 @@ const RegisterForm = () => {
           value={name}
           onChange={(e) => setName(e.target.value)}
         />
-        <input
-          type="email"
-          name="email"
-          required={true}
-          placeholder="Email"
-          value={email}
-          onChange={(e) => {
-            setErrMsg(null);
-            setEmail(e.target.value);
-          }}
-        />
+        {
+          //   <input
+          //   type="email"
+          //   name="email"
+          //   required={true}
+          //   placeholder="Email"
+          //   value={email}
+          //   onChange={(e) => {
+          //     setErrMsg(null);
+          //     setEmail(e.target.value);
+          //   }}
+          // />
+        }
         <input
           type="tel"
           name="phone"
@@ -115,16 +120,13 @@ const RegisterForm = () => {
         </section>
         <section className="checkbox">
           <Checkbox required={true} />
-          <label>I accept to the Terms and Conditions and Privacy Policy</label>
+          <label>I accept the Terms and Conditions and Privacy Policy</label>
         </section>
         <button disabled={errMsg} type="submit">
           Register
         </button>
       </form>
       {errMsg && <p className="errMsg">{errMsg}</p>}
-      <p className="links">
-        Already have an account? <Link to="/login">Login</Link>
-      </p>
     </div>
   );
 };
@@ -148,7 +150,8 @@ const LoginForm = () => {
       .then((res) => res.json())
       .then((data) => {
         if (data.user) {
-          setUser(user);
+          setUser(data.user);
+          console.log(user);
           history.push("/dashboard/home");
         } else if (data.code === 401) {
           setInvadilCred("Invalid credential!");
@@ -181,10 +184,13 @@ const LoginForm = () => {
       <img
         className="logo"
         onClick={() => history.push("")}
-        src="/logo_land.jpg"
+        src="/logo_benner.jpg"
         alt="Delivery pay logo"
       />
       <p className="title">Login as Admin</p>
+      <p className="links">
+        Don't have an account? <Link to="/join">Register</Link>
+      </p>
       <form onSubmit={submit}>
         <input
           type="text"
@@ -227,18 +233,16 @@ const LoginForm = () => {
           cookiePolicy={"single_host_origin"}
         />
       </section>
-      <p className="links">
-        Don't have an account? <Link to="/join">Register</Link>
-      </p>
       {invalidCred && <p className="errMsg">{invalidCred}</p>}
     </div>
   );
 };
 const PasswordReset = () => {
   const { user, setUser } = useContext(SiteContext);
+  const [loading, setLoading] = useState(false);
   const history = useHistory();
   const [step, setStep] = useState(1);
-  const [phone, setPhone] = useState("");
+  const [id, setId] = useState("");
   const [invalidCred, setInvadilCred] = useState(false);
   const [code, setCode] = useState(["", "", "", "", "", ""]);
   const [pass, setPass] = useState("");
@@ -250,30 +254,48 @@ const PasswordReset = () => {
   const code4 = useRef(null);
   const code5 = useRef(null);
   const code6 = useRef(null);
-  useEffect(() => {
-    console.log(errMsg);
-  }, [errMsg]);
   const submit = (e) => {
+    let phone = null;
+    let email = null;
     e.preventDefault();
+    const emailReg = new RegExp(
+      /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+    );
+    const phoneReg = new RegExp(
+      /((\+*)((0[ -]+)*|(91 )*)(\d{12}|\d{10}))|\d{5}([- ]*)\d{6}/
+    );
+    if (emailReg.test(id.toLowerCase())) {
+      email = id.toLowerCase();
+    } else if (phoneReg.test(id.toLowerCase())) {
+      phone = "+91" + id.replace(/^\+?9?1?/, "");
+    }
     if (step === 1) {
       if (errMsg) return;
-      fetch("/api/sendAdminForgotPassOTP", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ phone }),
-      }).then((res) => {
-        if (res.status === 200) {
-          setStep(2);
-        } else {
-          setErrMsg("User does does not exists.");
-        }
-      });
+      if (phone || email) {
+        setLoading(true);
+        fetch("/api/sendAdminForgotPassOTP", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ phone, email }),
+        }).then((res) => {
+          setLoading(false);
+          if (res.status === 200) {
+            setStep(2);
+          } else {
+            setErrMsg("User does does not exists.");
+          }
+        });
+      } else {
+        setErrMsg("Enter a valid phone number or email.");
+      }
     } else if (step === 2) {
+      setLoading(true);
       fetch("/api/submitAdminForgotPassOTP", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ phone, code: code.join("") }),
       }).then((res) => {
+        setLoading(false);
         if (res.status === 200) {
           setStep(3);
         } else if (res.status === 400) {
@@ -281,12 +303,12 @@ const PasswordReset = () => {
           setErrMsg("Wrong code!");
         } else if (res.status === 429) {
           setStep(1);
-          setPhone("");
+          setId("");
           setCode(["", "", "", "", "", ""]);
-          setErrMsg("Too many tries. Start again.");
+          setErrMsg("Too many attempts. Start again.");
         } else if (res.status === 404) {
           setStep(1);
-          setPhone("");
+          setId("");
           setCode(["", "", "", "", "", ""]);
           setErrMsg("Timeout. Start again");
         }
@@ -296,6 +318,7 @@ const PasswordReset = () => {
         setErrMsg("Password did not match");
         return;
       }
+      setLoading(true);
       fetch("/api/adminResetPass", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
@@ -303,10 +326,15 @@ const PasswordReset = () => {
       })
         .then((res) => res.json())
         .then((data) => {
+          setLoading(false);
           if (data.user) {
             setUser(user);
-            history.push("/dashboard/home");
+            history.push("/account/home");
           }
+        })
+        .catch((err) => {
+          console.log(err);
+          setLoading(false);
         });
     }
   };
@@ -317,22 +345,25 @@ const PasswordReset = () => {
   }, [code]);
   return (
     <div className="formWrapper resetPass">
-      <img className="logo" src="/logo_land.jpg" alt="Delivery pay logo" />
+      <img className="logo" src="/logo_benner.jpg" alt="Delivery pay logo" />
       <p className="title">Password reset</p>
+      <p className="links">
+        Already have an account?<Link to="/login">Login</Link>
+      </p>
       {step === 1 && (
         <form onSubmit={submit}>
           <input
-            type="tel"
+            type="text"
             name="phone"
             required={true}
-            placeholder="Phone Number"
-            value={phone}
+            placeholder="Phone Number or email"
+            value={id}
             onChange={(e) => {
               setErrMsg(null);
-              setPhone(e.target.value);
+              setId(e.target.value);
             }}
           />
-          <button disabled={errMsg} type="submit">
+          <button disabled={errMsg || loading} type="submit">
             Next
           </button>
         </form>
@@ -437,7 +468,7 @@ const PasswordReset = () => {
               }}
             />
           </section>
-          <button disabled={errMsg} type="submit">
+          <button disabled={errMsg || loading} type="submit">
             Next
           </button>
         </form>
@@ -471,15 +502,12 @@ const PasswordReset = () => {
               }}
             />
           </section>
-          <button disabled={errMsg} type="submit">
+          <button disabled={errMsg || loading} type="submit">
             {step === 3 ? "Submit" : "Next"}
           </button>
         </form>
       )}
       {errMsg && <p className="errMsg">{errMsg}</p>}
-      <p className="links">
-        Already have an account?<Link to="/login">Login</Link>
-      </p>
     </div>
   );
 };
@@ -498,31 +526,35 @@ function UserStart() {
       });
   }, []);
   return (
-    <div className="userStart">
-      <div className="banner">
-        <header>
-          <h3>This section is only for Admins</h3>
-          <p>Make sure you know what you're doing.</p>
-        </header>
-        <img
-          className="illustration"
-          src="/landingPage_illustration.svg"
-          alt="illustration"
-        />
+    <div className="generic">
+      <Header />
+      <div className="userStart">
+        <div className="banner">
+          <div className="header">
+            <h3>This section is only for Admins</h3>
+            <p>Make sure you know what you're doing.</p>
+          </div>
+          <img
+            className="illustration"
+            src="/landingPage_illustration.png"
+            alt="illustration"
+          />
+        </div>
+        <div className="forms">
+          <Switch>
+            <Route path="/join">
+              <RegisterForm />
+            </Route>
+            <Route path="/resetPassword">
+              <PasswordReset />
+            </Route>
+            <Route path="/">
+              <LoginForm />
+            </Route>
+          </Switch>
+        </div>
       </div>
-      <div className="forms">
-        <Switch>
-          <Route path="/join">
-            <RegisterForm />
-          </Route>
-          <Route path="/resetPassword">
-            <PasswordReset />
-          </Route>
-          <Route path="/">
-            <LoginForm />
-          </Route>
-        </Switch>
-      </div>
+      <Footer />
     </div>
   );
 }

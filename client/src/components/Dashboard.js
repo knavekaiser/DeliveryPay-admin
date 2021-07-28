@@ -355,32 +355,34 @@ function Dashboard({ location }) {
             <p className="label">Disputes</p>
           </Link>
         </li>
-        <li
-          className={`settings ${
-            location.pathname.startsWith("/dashboard/settings")
-              ? "active"
-              : undefined
-          }`}
-        >
-          <Link to="/dashboard/settings">
-            <div className="icon">
-              <img src="/setting.png" />
-            </div>
-            <p className="label">Settings</p>
-          </Link>
-        </li>
-        <li
-          className={`${
-            location.pathname.startsWith("/dashboard/analytics") ? "active" : ""
-          }`}
-        >
-          <Link to="/dashboard/analytics">
-            <div className="icon">
-              <img src="/analytics.png" />
-            </div>
-            <p className="label">Analytics</p>
-          </Link>
-        </li>
+        {
+          //   <li
+          //   className={`settings ${
+          //     location.pathname.startsWith("/dashboard/settings")
+          //       ? "active"
+          //       : undefined
+          //   }`}
+          // >
+          //   <Link to="/dashboard/settings">
+          //     <div className="icon">
+          //       <img src="/setting.png" />
+          //     </div>
+          //     <p className="label">Settings</p>
+          //   </Link>
+          // </li>
+          // <li
+          //   className={`${
+          //     location.pathname.startsWith("/dashboard/analytics") ? "active" : ""
+          //   }`}
+          // >
+          //   <Link to="/dashboard/analytics">
+          //     <div className="icon">
+          //       <img src="/analytics.png" />
+          //     </div>
+          //     <p className="label">Analytics</p>
+          //   </Link>
+          // </li>
+        }
         <Accordion
           className={`support ${
             location.pathname.startsWith("/dashboard/support") ? "active" : ""

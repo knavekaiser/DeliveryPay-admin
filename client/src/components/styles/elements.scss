@@ -128,3 +128,65 @@ $blue: #336cf9;
     }
   }
 }
+
+.generic {
+  min-height: calc(var(--vh) * 100);
+  display: grid;
+  grid-template-rows: min-content 1fr min-content;
+  header {
+    background: white;
+    z-index: 100;
+    position: sticky;
+    top: 0;
+    padding: 0.75rem 2rem;
+    box-shadow: 0 0 0.5rem rgba(0, 0, 0, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    .logo {
+      max-height: 3rem;
+    }
+    .clas {
+      justify-content: flex-end;
+      z-index: 1;
+      margin-right: 0;
+      display: flex;
+      grid-gap: 2rem;
+      a {
+        flex: 1;
+        border-radius: 2rem;
+        width: max-content;
+        text-align: center;
+        border: 2px solid white;
+        color: white;
+        font-weight: 500;
+        padding: 0.7rem 2rem;
+        background-image: linear-gradient(
+          165deg,
+          rgba(51, 108, 249, 1) 20%,
+          rgba(27, 230, 214, 1) 150%
+        );
+        &:hover {
+          color: $blue;
+          background: white;
+          box-shadow: inset 0 0 0 2px $blue;
+        }
+      }
+    }
+  }
+  footer {
+    border-top: 1px solid rgba(0, 0, 0, 0.17);
+    padding: 3rem 2rem;
+    .links {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      grid-gap: 1rem;
+      a {
+        width: max-content;
+        &:hover {
+          color: $blue;
+        }
+      }
+    }
+  }
+}

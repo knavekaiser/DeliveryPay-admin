@@ -272,3 +272,71 @@ app.patch(
     }
   }
 );
+
+app.get(
+  "/api/contactRequest",
+  passport.authenticate("adminPrivate"),
+  (req, res) => {
+    const { status, page, perPage, sort, order, dateFrom, dateTo } = req.query;
+    const query = {
+      ...(status && { status }),
+      ...(dateFrom &&
+        dateTo && {
+          createdAt: {
+            $gte: new Date(dateFrom),
+            $lt: new Date(dateTo),
+          },
+        }),
+    };
+    const sortOrder = {
+      [sort || "createdAt"]: order === "asc" ? 1 : -1,
+    };
+    ContactUs.aggregate([
+      { $match: query },
+      {
+        $lookup: {
+          from: "users",
+          as: "user",
+          localField: "user",
+          foreignField: "_id",
+        },
+      },
+      { $set: { user: { $first: "$user" } } },
+      { $sort: sortOrder },
+      {
+        $facet: {
+          contactRequests: [
+            { $skip: +perPage * (+(page || 1) - 1) },
+            { $limit: +(perPage || 20) },
+          ],
+          pageInfo: [{ $group: { _id: null, count: { $sum: 1 } } }],
+        },
+      },
+    ])
+      .then((dbRes) => {
+        res.json({ code: "ok", contactRequests: dbRes[0] });
+      })
+      .catch((err) => {
+        console.log(err);
+        res.status(500).josn({ code: 500, message: "database error" });
+      });
+  }
+);
+app.delete(
+  "/api/deleteContactRequest",
+  passport.authenticate("adminPrivate"),
+  (req, res) => {
+    const { _id } = req.body;
+    if (_id && ObjectId.isValid(_id)) {
+      ContactUs.findOneAndDelete({ _id }).then((dbRes) => {
+        if (dbRes) {
+          res.json({ code: "ok", message: "request successfully deleted." });
+        } else {
+          res.status(500).json({ code: 500, message: "database error" });
+        }
+      });
+    } else {
+      res.status(400).json({ code: 400, message: "valid _id is required" });
+    }
+  }
+);

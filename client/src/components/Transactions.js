@@ -138,9 +138,9 @@ function Transactions({ history, location, pathname }) {
         <section
           className={`date ${dateFilter ? "open" : ""}`}
           ref={dateFilterRef}
+          onClick={() => setDateOpen(true)}
         >
           <svg
-            onClick={() => setDateOpen(true)}
             xmlns="http://www.w3.org/2000/svg"
             width="30.971"
             height="30.971"

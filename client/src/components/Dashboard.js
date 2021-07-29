@@ -14,8 +14,9 @@ import {
 import { GoogleLogout } from "react-google-login";
 import Transactions from "./Transactions";
 import Milestones from "./Milestones";
+import Settings from "./Settings";
 import Disputes, { SingleDispute } from "./Disputes";
-import { Faqs, Tickets, SingleTicket } from "./Support";
+import { Faqs, Tickets, SingleTicket, ContactRequest } from "./Support";
 import Moment from "react-moment";
 require("./styles/dashboard.scss");
 
@@ -336,7 +337,7 @@ function Dashboard({ location }) {
         >
           <Link to="/dashboard/transactions">
             <div className="icon">
-              <img src="/cargo.png" />
+              <img src="/transaction.png" />
             </div>
             <p className="label">Transactions</p>
           </Link>
@@ -355,21 +356,21 @@ function Dashboard({ location }) {
             <p className="label">Disputes</p>
           </Link>
         </li>
+        <li
+          className={`settings ${
+            location.pathname.startsWith("/dashboard/settings")
+              ? "active"
+              : undefined
+          }`}
+        >
+          <Link to="/dashboard/settings">
+            <div className="icon">
+              <img src="/setting.png" />
+            </div>
+            <p className="label">Settings</p>
+          </Link>
+        </li>
         {
-          //   <li
-          //   className={`settings ${
-          //     location.pathname.startsWith("/dashboard/settings")
-          //       ? "active"
-          //       : undefined
-          //   }`}
-          // >
-          //   <Link to="/dashboard/settings">
-          //     <div className="icon">
-          //       <img src="/setting.png" />
-          //     </div>
-          //     <p className="label">Settings</p>
-          //   </Link>
-          // </li>
           // <li
           //   className={`${
           //     location.pathname.startsWith("/dashboard/analytics") ? "active" : ""
@@ -430,6 +431,23 @@ function Dashboard({ location }) {
                 <p className="label">Tickets</p>
               </Link>
             </li>
+            <li>
+              <Link
+                to="/dashboard/support/contactRequest"
+                className={`${
+                  location.pathname.startsWith(
+                    "/dashboard/support/contactRequest"
+                  )
+                    ? "active"
+                    : ""
+                }`}
+              >
+                <div className="icon">
+                  <img src="/cargo.png" />
+                </div>
+                <p className="label">Contact Request</p>
+              </Link>
+            </li>
           </ul>
         </Accordion>
       </ul>
@@ -447,6 +465,11 @@ function Dashboard({ location }) {
             component={SingleTicket}
           />
           <Route path="/dashboard/support/tickets" component={Tickets} />
+          <Route path="/dashboard/settings" component={Settings} />
+          <Route
+            path="/dashboard/support/contactRequest"
+            component={ContactRequest}
+          />
           <Route
             exact
             path="/dashboard/disputes/:_id"

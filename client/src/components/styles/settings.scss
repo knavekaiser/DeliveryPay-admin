@@ -1,0 +1,189 @@
+@import "variables";
+
+.settingsContainer {
+  padding: 0 3rem;
+  .benner {
+    padding: 1.5rem 0;
+    .profileImg {
+      width: 6.6rem;
+      height: 6.6rem;
+      border-radius: 50%;
+      overflow: hidden;
+      position: relative;
+      img {
+        height: 100%;
+        width: 100%;
+        object-fit: cover;
+      }
+      svg {
+        position: absolute;
+        bottom: 0;
+        left: 50%;
+        transform: translateX(-50%);
+      }
+      label {
+        position: absolute;
+        bottom: 5px;
+        font-size: 0.9rem;
+        left: 50%;
+        transform: translateX(-50%);
+        color: $blue;
+        font-weight: 500;
+      }
+      input {
+        cursor: pointer;
+        opacity: 0;
+        z-index: 10;
+        position: absolute;
+        left: 0;
+        top: 0;
+        font-size: 100px;
+      }
+    }
+    display: flex;
+    align-items: center;
+    grid-gap: 1.5rem;
+    div {
+      .name {
+        font-size: 1.3rem;
+        margin-bottom: 0.6rem;
+        text-transform: capitalize;
+      }
+      .id {
+        font-size: 0.8rem;
+        color: rgba(0, 0, 0, 0.51);
+      }
+    }
+  }
+  .head {
+    padding: 1rem 0;
+    font-size: 1.4rem;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.6);
+    font-weight: 300;
+    color: rgba(0, 0, 0, 0.75);
+  }
+  .settings {
+    ul {
+      li {
+        padding: 2rem 0;
+        &:not(:last-child) {
+          border-bottom: 1px solid rgba(0, 0, 0, 0.15);
+        }
+        display: flex;
+        align-items: center;
+        .label {
+          flex: 1;
+          max-width: 10rem;
+          font-size: 0.95rem;
+          color: rgba(0, 0, 0, 0.7);
+        }
+        form {
+          flex: 1;
+          display: flex;
+          align-items: center;
+          .currentValue {
+            flex: 1;
+            font-weight: 500;
+          }
+          .inputs {
+            flex: 1;
+            display: grid;
+            grid-gap: 1rem;
+            input {
+              width: 100%;
+              max-width: 20rem;
+              border: none;
+              padding: 0.5rem 0;
+              border-bottom: 1px solid rgba(0, 0, 0, 0.44);
+              outline: none;
+              &:focus {
+                border-color: $blue;
+              }
+            }
+          }
+          .btns {
+            display: grid;
+            align-items: center;
+            width: 8rem;
+            grid-gap: 1rem;
+            button {
+              border: none;
+              outline: none;
+              background: none;
+              color: $blue;
+              cursor: pointer;
+              font-weight: 600;
+              &:hover {
+                opacity: 0.5;
+              }
+            }
+          }
+          .errMsg {
+            margin-top: 1rem;
+            color: $red;
+          }
+        }
+      }
+    }
+  }
+  .methods {
+    margin-top: 2rem;
+    display: grid;
+    grid-gap: 1.5rem;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    li {
+      position: relative;
+      .actions {
+        z-index: 10;
+        display: none;
+        position: absolute;
+        right: 0.5rem;
+        top: 0.5rem;
+        grid-gap: 0.3rem;
+        button {
+          cursor: pointer;
+          color: white;
+          font-weight: 600;
+          padding: 0.25rem 1rem;
+          outline: none;
+          border: 2px solid $blue;
+          border-radius: 2rem;
+          background: $blue;
+          &:hover {
+            background: white;
+            color: $blue;
+          }
+          &.delete {
+            color: white;
+            border-color: $red;
+            background: $red;
+            &:hover {
+              background: white;
+              color: $red;
+            }
+          }
+        }
+      }
+      &:hover {
+        .actions {
+          display: flex;
+        }
+      }
+      .paymentMethod {
+        &:hover {
+          opacity: 1;
+        }
+        height: 100%;
+      }
+    }
+  }
+  .socials {
+    margin-top: 2rem;
+    .providers {
+      display: flex;
+      grid-gap: 1rem;
+      margin-top: 2rem;
+    }
+  }
+  padding-bottom: 8rem;
+}

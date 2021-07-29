@@ -1,14 +1,11 @@
-$pink: #f9eaf4;
-$lightBlue: #e7f6fc;
-$red: #fc0660;
-$blue: #336cf9;
+@import "variables";
 
 .account {
   display: grid;
   grid-template-columns: min-content 1fr;
   height: calc(var(--vh) * 100);
   .sidebar {
-    background: $pink;
+    background: $lightPink;
     padding: 1.5rem;
     display: grid;
     grid-gap: 0.5rem;

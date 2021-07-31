@@ -41,8 +41,8 @@ global.Admin = mongoose.model("Admin", adminModel);
 
 const userModel = new Schema(
   {
-    firstName: { type: String, required: true, trim: true },
-    lastName: { type: String, required: true, trim: true },
+    firstName: { type: String, trim: true },
+    lastName: { type: String, trim: true },
     googleId: { type: String, unique: true, sparse: true },
     facebookId: { type: String, unique: true, sparse: true },
     twitterId: { type: String, unique: true, sparse: true },

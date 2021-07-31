@@ -344,14 +344,18 @@ function Disputes({ history, location, match }) {
 }
 
 export const SingleDispute = ({ history, location, match }) => {
+  const chatRef = useRef();
   const [data, setData] = useState(null);
   const [msg, setMsg] = useState(null);
+  const [showChat, setShowChat] = useState(false);
+  const [chat, setChat] = useState([]);
   useEffect(() => {
     fetch(`/api/singleDispute?_id=${match.params._id}`)
       .then((res) => res.json())
       .then((data) => {
         if (data.code === "ok") {
           setData(data.dispute);
+          setChat(data.chat?.messages || []);
         }
       })
       .catch((err) => {
@@ -367,11 +371,19 @@ export const SingleDispute = ({ history, location, match }) => {
         );
       });
   }, []);
+  useEffect(() => {
+    if (showChat && chatRef.current) {
+      chatRef.current?.scrollBy(0, chatRef.current.scrollHeight);
+    }
+  }, [showChat]);
   if (data) {
     return (
       <div className={`singleDispute ${data.status}`}>
         <div className="disputeSummery">
-          <div className="benner">Dispute Summery</div>
+          <div className="benner">
+            Dispute Summery{" "}
+            <button onClick={(e) => setShowChat(true)}>View Chat</button>
+          </div>
           <ul className="disputeDetail">
             <li>
               <label>Dispute ID:</label>
@@ -427,10 +439,174 @@ export const SingleDispute = ({ history, location, match }) => {
         <Modal open={msg} className="msg">
           {msg}
         </Modal>
+        <Modal open={showChat} className="disputeChat" ref={chatRef}>
+          <div className="chatHead">
+            <div className="user">
+              <img src={data.plaintiff.profileImg} />
+              <p className="name">
+                {data.plaintiff.firstName + " " + data.plaintiff.lastName}
+                <span className="role">Plaintiff</span>
+              </p>
+            </div>
+            <button onClick={() => setShowChat(false)}>
+              <X_svg />
+            </button>
+            <div className="user def">
+              <img src={data.defendant.profileImg || "/profile-user.jpg"} />
+              <p className="name">
+                {data.defendant.firstName + " " + data.defendant.lastName}
+                <span className="role">Defendant</span>
+              </p>
+            </div>
+          </div>
+          <Chat
+            chat={chat}
+            user={data.defendant._id}
+            client={data.plaintiff._id}
+          />
+        </Modal>
       </div>
     );
   }
-  return <>loading</>;
+  return (
+    <div className="singleDispute loading">
+      <div className="disputeSummery">
+        <div className="benner">Dispute Summery</div>
+        <ul>
+          <li>
+            <div />
+            <div />
+          </li>
+          <li>
+            <div />
+            <div />
+          </li>
+          <li>
+            <div />
+            <div />
+          </li>
+        </ul>
+      </div>
+      <div className="plaintiff">
+        <div className="benner">Plaintiff</div>
+        <div className="user">
+          <div className="img" />
+          <div className="name" />
+        </div>
+        <ul className="detail">
+          <li>
+            <div />
+            <div />
+          </li>
+          <li>
+            <div />
+            <div />
+          </li>
+          <li>
+            <div />
+            <div />
+          </li>
+        </ul>
+      </div>
+      <div className="defendant">
+        <div className="benner">Defendant</div>
+        <div className="user">
+          <div className="img" />
+          <div className="name" />
+        </div>
+        <ul className="detail">
+          <li>
+            <div />
+            <div />
+          </li>
+          <li>
+            <div />
+            <div />
+          </li>
+          <li>
+            <div />
+            <div />
+          </li>
+        </ul>
+      </div>
+    </div>
+  );
+};
+
+const Chat = ({ chat, user, client }) => {
+  return (
+    <ul className="chats">
+      {chat.map((msg, i) => {
+        if (!msg) {
+          return null;
+        }
+        const timestamp =
+          Math.abs(
+            new Date(msg.createdAt).getTime() -
+              new Date(chat[i + 1]?.createdAt).getTime()
+          ) > 120000;
+        const dateStamp =
+          moment(msg.createdAt).format("YYYY-MM-DD") !==
+            moment(chat[i - 1]?.createdAt).format("YYYY-MM-DD") || i === 0;
+        return (
+          <li
+            key={i}
+            className={`bubble ${msg.from === user ? "user" : "client"}`}
+          >
+            {dateStamp && (
+              <Moment className="dateStamp" format="MMM DD, YYYY">
+                {msg.createdAt}
+              </Moment>
+            )}
+            {msg.text && <p className="text">{msg.text}</p>}
+            {msg.media && <MediaBubble link={msg.media} />}
+            {(timestamp || i === chat.length - 1) && (
+              <Moment className="timestamp" format="hh:mm a">
+                {msg.createdAt}
+              </Moment>
+            )}
+          </li>
+        );
+      })}
+    </ul>
+  );
+};
+
+const MediaBubble = ({ link }) => {
+  let view = null;
+  let fullView = null;
+  const [open, setOpen] = useState(false);
+  if (link.match(/(\.gif|\.png|\.jpg|\.jpeg|\.webp)$/)) {
+    view = <img src={link} onClick={() => setOpen(true)} />;
+  } else if (link.match(/(\.mp3|\.ogg|\.amr|\.m4a|\.flac|\.wav|\.aac)$/)) {
+    view = <audio src={link} controls="on" />;
+  } else if (link.match(/(\.mp4|\.mov|\.avi|\.flv|\.wmv|\.webm)$/)) {
+    view = (
+      <div className={`videoThumb`}>
+        <video src={link} onClick={() => setOpen(true)} />
+        <img src="/play_btn.png" />
+      </div>
+    );
+    fullView = <video src={link} controls="on" autoPlay="on" />;
+  } else {
+    view = (
+      <a href={link} target="_blank" className="link">
+        <img src="/file_icon.png" />
+        {link}
+      </a>
+    );
+  }
+  return (
+    <div className="file">
+      {view}
+      <Modal open={open} className="chatMediaView">
+        <button className="close" onClick={() => setOpen(false)}>
+          <X_svg />
+        </button>
+        {fullView || view}
+      </Modal>
+    </div>
+  );
 };
 
 const Case = ({ role, dispute, setData }) => {

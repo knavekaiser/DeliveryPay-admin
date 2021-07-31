@@ -260,9 +260,22 @@ app.get(
             },
           },
         },
-      ]).then((dbRes) => {
+      ]).then(async (dbRes) => {
         if (dbRes.length) {
-          res.json({ code: "ok", dispute: dbRes[0] });
+          const [dispute] = dbRes;
+          const chat = await Chat.findOne({
+            $or: [
+              {
+                user: dispute.plaintiff._id,
+                client: dispute.defendant._id,
+              },
+              {
+                client: dispute.plaintiff._id,
+                user: dispute.defendant._id,
+              },
+            ],
+          });
+          res.json({ code: "ok", dispute, chat });
         } else {
           res.json({ code: 400, message: "Dispute could not be found" });
         }

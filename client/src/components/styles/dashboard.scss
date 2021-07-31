@@ -78,6 +78,9 @@
       h3 {
         font-weight: 500;
       }
+      .menuBtn {
+        display: none;
+      }
       .profile {
         display: flex;
         grid-gap: 1rem;
@@ -251,6 +254,47 @@
     h3 {
       font-size: 2rem;
       font-weight: 400;
+    }
+  }
+}
+
+@media only screen and (max-width: 480px) {
+  .account {
+    overflow-y: hidden;
+    .sidebar {
+      height: calc(var(--vh) * 100);
+      position: fixed;
+      left: -100%;
+      z-index: 1000;
+      box-shadow: 0 0 1rem rgba(0, 0, 0, 0.3);
+      &.open {
+        left: 0;
+      }
+    }
+    .sidebarBackdrop {
+      z-index: 100;
+      position: fixed;
+      height: 100%;
+      width: 100%;
+      background: rgba(0, 0, 0, 0.3);
+    }
+    main {
+      header {
+        padding: 0.5rem 1rem;
+        .menuBtn {
+          background: none;
+          border: none;
+          outline: none;
+          display: block;
+          display: grid;
+          img {
+            height: 2rem;
+          }
+        }
+        h3 {
+          display: none;
+        }
+      }
     }
   }
 }

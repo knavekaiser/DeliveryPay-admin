@@ -41,7 +41,8 @@ const workRequestModel = new Schema(
     lastName: { type: String, required: true, trim: true },
     email: { type: String },
     phone: { type: String },
-    dscr: { type: String, required: true },
+    dscr: { type: String },
+    resume: { type: String, required: true },
   },
   { timestamps: true }
 );

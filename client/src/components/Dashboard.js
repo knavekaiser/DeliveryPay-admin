@@ -16,7 +16,13 @@ import Transactions from "./Transactions";
 import Milestones from "./Milestones";
 import Settings from "./Settings";
 import Disputes, { SingleDispute } from "./Disputes";
-import { Faqs, Tickets, SingleTicket, ContactRequest } from "./Support";
+import {
+  Faqs,
+  Tickets,
+  SingleTicket,
+  ContactRequest,
+  WorkRequest,
+} from "./Support";
 import Moment from "react-moment";
 require("./styles/dashboard.scss");
 
@@ -259,13 +265,17 @@ const Home = () => {
 
 function Dashboard({ location }) {
   const { user } = useContext(SiteContext);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   return (
     <div
       className={`account ${
         location.pathname.startsWith("/dashboard/deals/") ? "chatSection" : ""
       }`}
     >
-      <ul className="sidebar">
+      <ul
+        className={`sidebar ${sidebarOpen ? "open" : ""}`}
+        onClick={(e) => setSidebarOpen(false)}
+      >
         <li>
           <img className="logo" src="/logo_land.jpg" alt="Delivery pay logo" />
         </li>
@@ -433,6 +443,21 @@ function Dashboard({ location }) {
             </li>
             <li>
               <Link
+                to="/dashboard/support/workRequest"
+                className={`${
+                  location.pathname.startsWith("/dashboard/support/workRequest")
+                    ? "active"
+                    : ""
+                }`}
+              >
+                <div className="icon">
+                  <img src="/cargo.png" />
+                </div>
+                <p className="label">Job Application</p>
+              </Link>
+            </li>
+            <li>
+              <Link
                 to="/dashboard/support/contactRequest"
                 className={`${
                   location.pathname.startsWith(
@@ -451,8 +476,17 @@ function Dashboard({ location }) {
           </ul>
         </Accordion>
       </ul>
+      {sidebarOpen && (
+        <div
+          className="sidebarBackdrop"
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
       <main>
         <header>
+          <button className="menuBtn" onClick={() => setSidebarOpen(true)}>
+            <img src="/menu.svg" />
+          </button>
           <h3>Now Pay after Delivery with Delivery Pay</h3>
           <ProfileAvatar />
         </header>
@@ -465,6 +499,10 @@ function Dashboard({ location }) {
             component={SingleTicket}
           />
           <Route path="/dashboard/support/tickets" component={Tickets} />
+          <Route
+            path="/dashboard/support/workRequest"
+            component={WorkRequest}
+          />
           <Route path="/dashboard/settings" component={Settings} />
           <Route
             path="/dashboard/support/contactRequest"

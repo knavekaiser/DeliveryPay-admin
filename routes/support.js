@@ -136,8 +136,9 @@ app.delete(
 );
 
 app.get("/api/tickets", passport.authenticate("adminPrivate"), (req, res) => {
-  const { status, page, perPage, sort, order, dateFrom, dateTo } = req.query;
+  const { q, status, page, perPage, sort, order, dateFrom, dateTo } = req.query;
   const query = {
+    ...(q && { issue: new RegExp(q, "gi") }),
     ...(status && { status }),
     ...(dateFrom &&
       dateTo && {
@@ -277,8 +278,20 @@ app.get(
   "/api/contactRequest",
   passport.authenticate("adminPrivate"),
   (req, res) => {
-    const { status, page, perPage, sort, order, dateFrom, dateTo } = req.query;
+    const {
+      q,
+      status,
+      page,
+      perPage,
+      sort,
+      order,
+      dateFrom,
+      dateTo,
+    } = req.query;
     const query = {
+      ...(q && {
+        $or: [{ name: new RegExp(q, "gi") }, { message: new RegExp(q, "gi") }],
+      }),
       ...(status && { status }),
       ...(dateFrom &&
         dateTo && {
@@ -293,15 +306,6 @@ app.get(
     };
     ContactUs.aggregate([
       { $match: query },
-      {
-        $lookup: {
-          from: "users",
-          as: "user",
-          localField: "user",
-          foreignField: "_id",
-        },
-      },
-      { $set: { user: { $first: "$user" } } },
       { $sort: sortOrder },
       {
         $facet: {
@@ -338,5 +342,70 @@ app.delete(
     } else {
       res.status(400).json({ code: 400, message: "valid _id is required" });
     }
+  }
+);
+
+app.get(
+  "/api/viewAllWorkRequest",
+  passport.authenticate("adminPrivate"),
+  (req, res) => {
+    const { q, page, perPage, sort, order, dateFrom, dateTo } = req.query;
+    const sortOrder = {
+      [sort || "createdAt"]: order === "asc" ? 1 : -1,
+    };
+    const query = {
+      ...(q && {
+        $or: [
+          { email: new RegExp(q, "gi") },
+          { phone: new RegExp(q, "gi") },
+          { firstName: new RegExp(q, "gi") },
+        ],
+      }),
+      ...(dateFrom &&
+        dateTo && {
+          createdAt: {
+            $gte: new Date(dateFrom),
+            $lt: new Date(dateTo),
+          },
+        }),
+    };
+    WorkRequest.aggregate([
+      { $match: query },
+      { $sort: sortOrder },
+      {
+        $facet: {
+          requests: [
+            { $skip: +perPage * (+(page || 1) - 1) },
+            { $limit: +(perPage || 20) },
+          ],
+          pageInfo: [{ $group: { _id: null, count: { $sum: 1 } } }],
+        },
+      },
+    ])
+      .then((dbRes) => {
+        res.json({ code: "ok", requests: dbRes[0] });
+      })
+      .catch((err) => {
+        console.log(err);
+        res.status(500).json({ message: "something went wrong" });
+      });
+  }
+);
+app.delete(
+  "/api/deleteWorkRequest",
+  passport.authenticate("adminPrivate"),
+  (req, res) => {
+    WorkRequest.findByIdAndDelete(req.body._id)
+      .then((dbRes) => {
+        if (dbRes) {
+          res.json({ message: "request deleted" });
+        } else {
+          res.status(400).json({ message: "bad request" });
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+        res.status(500).json({ message: "something went wrong" });
+      });
   }
 );

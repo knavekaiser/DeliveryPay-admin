@@ -132,10 +132,79 @@
         .message {
           padding: 0.7rem 1rem;
         }
-        .files {
+        .thumbs {
+          background: rgba(255, 255, 255, 0.3);
           border-top: 1px solid rgba(0, 0, 0, 0.1);
           padding: 0.7rem 1rem;
         }
+      }
+    }
+  }
+  &.loading {
+    .summery,
+    .milestoneDetail,
+    .transactionDetail {
+      li {
+        display: flex;
+        grid-gap: 1rem;
+        label {
+          height: 1rem;
+          width: 5rem;
+          animation: fade 0.8s ease-in-out alternate infinite;
+          animation-delay: 0.1s;
+        }
+        p {
+          height: 1rem;
+          width: 10rem;
+          animation: fade 0.8s ease-in-out alternate infinite;
+          animation-delay: 0.2s;
+        }
+      }
+    }
+    .messages {
+      .head {
+        height: 3.5rem;
+      }
+      ul {
+        li {
+          .user {
+            grid-gap: 1rem;
+            align-items: center;
+            display: flex;
+            .img {
+              height: 2.5rem;
+              width: 2.5rem;
+              border-radius: 50%;
+              animation: fade 0.8s ease-in-out alternate infinite;
+              animation-delay: 0.3s;
+            }
+            .name {
+              height: 1rem;
+              width: 10rem;
+              animation: fade 0.8s ease-in-out alternate infinite;
+              animation-delay: 0.4s;
+            }
+          }
+          .message {
+            span {
+              display: block;
+              height: 1rem;
+              width: 70%;
+              animation: fade 0.8s ease-in-out alternate infinite;
+              animation-delay: 0.5s;
+            }
+          }
+        }
+      }
+    }
+    .thumbs {
+      display: flex;
+      grid-gap: 0.5rem;
+      .img {
+        animation: fade 0.8s ease-in-out alternate infinite;
+        animation-delay: 0.6s;
+        height: 5rem;
+        width: 5rem;
       }
     }
   }

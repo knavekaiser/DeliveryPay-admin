@@ -6,6 +6,7 @@ import {
   Paginaiton,
   Chev_down_svg,
   X_svg,
+  Media,
 } from "./Elements";
 import { Link } from "react-router-dom";
 import { Modal, Confirm } from "./Modal";
@@ -610,54 +611,6 @@ const MediaBubble = ({ link }) => {
 };
 
 const Case = ({ role, dispute, setData }) => {
-  const [mediaPreview, setMediaPreview] = useState(false);
-  const [media, setMedia] = useState(null);
-  const [index, setIndex] = useState(0);
-  const medias = dispute[role].case?.files?.map((item, i) => {
-    let thumb = null;
-    let view = null;
-    const handleClick = (e) => {
-      setMedia(view);
-      setIndex(i);
-    };
-    if (item.match(/(\.gif|\.png|\.jpg|\.jpeg|\.webp)$/)) {
-      thumb = (
-        <img
-          className={index === i ? "active" : ""}
-          key={i}
-          src={item}
-          onClick={handleClick}
-        />
-      );
-      view = <img key={i} src={item} />;
-    } else if (item.match(/(\.mp3|\.ogg|\.amr|\.m4a|\.flac|\.wav|\.aac)$/)) {
-      thumb = (
-        <div
-          key={i}
-          className={`audioThumb ${index === i ? "active" : ""}`}
-          onClick={handleClick}
-        >
-          <img src="/play_btn.png" />
-        </div>
-      );
-      view = <audio key={i} src={item} controls="on" autoPlay="on" />;
-    } else if (item.match(/(\.mp4|\.mov|\.avi|\.flv|\.wmv|\.webm)$/)) {
-      thumb = (
-        <div key={i} className={`videoThumb ${index === i ? "active" : ""}`}>
-          <video src={item} onClick={handleClick} />
-          <img src="/play_btn.png" />
-        </div>
-      );
-      view = <video key={i} src={item} controls="on" autoPlay="on" />;
-    } else {
-      thumb = (
-        <a key={i} href={i}>
-          {item}
-        </a>
-      );
-    }
-    return thumb;
-  });
   const [msg, setMsg] = useState(null);
   const resolveDispute = (winner) => {
     fetch("/api/resolveDispute", {
@@ -770,8 +723,12 @@ const Case = ({ role, dispute, setData }) => {
             </li>
             <li>
               <label>Evidence:</label>{" "}
-              <div className="thumbs" onClick={() => setMediaPreview(true)}>
-                {medias || "N/A"}
+              <div className="thumbs">
+                {dispute[role].case?.files?.length ? (
+                  <Media links={dispute[role].case?.files} />
+                ) : (
+                  "N/A"
+                )}
               </div>
             </li>
           </ul>
@@ -779,17 +736,6 @@ const Case = ({ role, dispute, setData }) => {
           <p className="noRes">Has not responded yet.</p>
         )}
       </div>
-      <Modal
-        className="disputeMediaView"
-        open={mediaPreview}
-        backdropClass="disputeMediaViewBack"
-      >
-        <button className="close" onClick={() => setMediaPreview(false)}>
-          <X_svg />
-        </button>
-        <div className="view">{media}</div>
-        <div className="thumbs">{medias}</div>
-      </Modal>
       <Modal open={msg} className="msg">
         {msg}
       </Modal>

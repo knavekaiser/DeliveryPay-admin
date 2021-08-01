@@ -911,6 +911,74 @@ export const NumberInput = ({ defaultValue, min, max, required, onChange }) => {
     </section>
   );
 };
+export const FileInput = ({
+  required,
+  onChange,
+  prefill,
+  label,
+  multiple,
+  accept,
+}) => {
+  const [files, setFiles] = useState(prefill || []);
+  useEffect(() => {
+    onChange(files);
+  }, [files]);
+  return (
+    <section className="fileInput">
+      {files.map((item, fileIndex) => {
+        const file =
+          typeof item === "string"
+            ? {
+                type: "url",
+                url: item,
+              }
+            : {
+                type: item.type,
+                name: item.name,
+                url: URL.createObjectURL(item),
+              };
+        const img =
+          file.type.startsWith("image") ||
+          file.url.match(/(\.gif|\.png|\.jpg|\.jpeg|\.webp)$/);
+        return (
+          <div key={fileIndex} className={`file ${img ? "thumb" : "any"}`}>
+            <button
+              className="close"
+              type="button"
+              onClick={() =>
+                setFiles((prev) => prev.filter((item, i) => i !== fileIndex))
+              }
+            >
+              <X_svg />
+            </button>
+            <img
+              className={img ? "thumb" : ""}
+              src={img ? file.url : "/file_icon.png"}
+            />
+            {!img && <p className="filename">{item.name}</p>}
+          </div>
+        );
+      })}
+      <div className="uploadBtn">
+        <Plus_svg />
+        <input
+          type="file"
+          multiple={multiple}
+          required={required}
+          accept={accept}
+          onChange={(e) => {
+            setFiles((prev) => [
+              ...prev,
+              ...[...e.target.files].filter(
+                (item) => !files.some((file) => file.name === item.name)
+              ),
+            ]);
+          }}
+        />
+      </div>
+    </section>
+  );
+};
 
 export const Paginaiton = ({
   total,
@@ -1022,5 +1090,117 @@ export const Footer = () => {
         </a>
       </div>
     </footer>
+  );
+};
+
+export const UploadFiles = ({ files, setMsg }) => {
+  const cdn = process.env.REACT_APP_CDN_HOST;
+  const formData = new FormData();
+  const uploaded = [];
+  for (var _file of files) {
+    if (typeof _file === "string") {
+      uploaded.push(_file);
+    } else {
+      formData.append("file", _file);
+    }
+  }
+  return fetch(`${cdn}/upload`, {
+    method: "POST",
+    body: formData,
+  })
+    .then((res) => res.json())
+    .then((data) => {
+      if (data.code === "ok") {
+        return [...uploaded, ...data.files.map((link) => cdn + "/" + link)];
+      } else {
+        setMsg(
+          <>
+            <button onClick={() => setMsg(null)}>Okay</button>
+            <div>
+              <Err_svg />
+              <h4>File upload failed</h4>
+            </div>
+          </>
+        );
+      }
+    })
+    .catch((err) => {
+      console.log(err);
+      setMsg(
+        <>
+          <button onClick={() => setMsg(null)}>Okay</button>
+          <div>
+            <Err_svg />
+            <h4>File upload failed. Make sure you're online.</h4>
+          </div>
+        </>
+      );
+    });
+};
+export const Media = ({ links }) => {
+  const [mediaPreview, setMediaPreview] = useState(false);
+  const [media, setMedia] = useState(null);
+  const [index, setIndex] = useState(0);
+  const medias = links.map((item, i) => {
+    let thumb = null;
+    let view = null;
+    const handleClick = (e) => {
+      setMediaPreview(true);
+      setMedia(view);
+      setIndex(i);
+    };
+    if (item.match(/(\.gif|\.png|\.jpg|\.jpeg|\.webp)$/)) {
+      thumb = (
+        <img
+          className={index === i ? "active" : ""}
+          key={i}
+          src={item}
+          onClick={handleClick}
+        />
+      );
+      view = <img key={i} src={item} />;
+    } else if (item.match(/(\.mp3|\.ogg|\.amr|\.m4a|\.flac|\.wav|\.aac)$/)) {
+      thumb = (
+        <div
+          key={i}
+          className={`audioThumb ${index === i ? "active" : ""}`}
+          onClick={handleClick}
+        >
+          <img src="/play_btn.png" />
+        </div>
+      );
+      view = <audio key={i} src={item} controls="on" autoPlay="on" />;
+    } else if (item.match(/(\.mp4|\.mov|\.avi|\.flv|\.wmv|\.webm)$/)) {
+      thumb = (
+        <div key={i} className={`videoThumb ${index === i ? "active" : ""}`}>
+          <video src={item} onClick={handleClick} />
+          <img src="/play_btn.png" />
+        </div>
+      );
+      view = <video key={i} src={item} controls="on" autoPlay="on" />;
+    } else {
+      thumb = (
+        <a key={i} href={i}>
+          {item}
+        </a>
+      );
+    }
+    return thumb;
+  });
+  return (
+    <>
+      {medias}
+      <Modal
+        className="mediaModal"
+        open={mediaPreview}
+        backdropClass="disputeMediaViewBack"
+      >
+        <button className="close" onClick={() => setMediaPreview(false)}>
+          <X_svg />
+        </button>
+        <div className="view">{media}</div>
+        <div className="thumbs">{medias}</div>
+      </Modal>
+    </>
   );
 };

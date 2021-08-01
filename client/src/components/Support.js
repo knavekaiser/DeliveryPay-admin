@@ -11,6 +11,9 @@ import {
   Arrow_left_svg,
   Chev_down_svg,
   X_svg,
+  Media,
+  UploadFiles,
+  FileInput,
 } from "./Elements";
 import moment from "moment";
 import { DateRange } from "react-date-range";
@@ -289,13 +292,13 @@ export const Faqs = ({ history, location, pathname }) => {
           }}
         />
       </Modal>
-      <Modal open={faqForm} className="formModal faqForm">
-        <div className="head">
-          <p className="modalName">Add FAQ</p>
-          <button onClick={() => setFaqForm(false)}>
-            <X_svg />
-          </button>
-        </div>
+      <Modal
+        open={faqForm}
+        head={true}
+        label="Add FAQ"
+        setOpen={setFaqForm}
+        className="formModal faqForm"
+      >
         <FaqForm
           onSuccess={(newFaq) => {
             setFaqs((prev) => [newFaq, ...prev]);
@@ -316,11 +319,13 @@ export const Faqs = ({ history, location, pathname }) => {
   );
 };
 const FaqForm = ({ edit, onSuccess, onCancel }) => {
+  const [loading, setLoading] = useState(false);
   const [msg, setMsg] = useState(null);
   const [ques, setQues] = useState(edit?.ques || "");
   const [ans, setAns] = useState(edit?.ans || "");
   const submit = (e) => {
     e.preventDefault();
+    setLoading(true);
     fetch("/api/faq", {
       method: edit ? "PATCH" : "POST",
       headers: { "Content-Type": "application/json" },
@@ -328,6 +333,7 @@ const FaqForm = ({ edit, onSuccess, onCancel }) => {
     })
       .then((res) => res.json())
       .then((data) => {
+        setLoading(false);
         if (data.code === "ok") {
           onSuccess?.(data.faq);
         } else {
@@ -343,6 +349,7 @@ const FaqForm = ({ edit, onSuccess, onCancel }) => {
         }
       })
       .catch((err) => {
+        setLoading(false);
         console.log(err);
         setMsg(
           <>
@@ -356,33 +363,40 @@ const FaqForm = ({ edit, onSuccess, onCancel }) => {
       });
   };
   return (
-    <form onSubmit={submit}>
-      <section>
-        <label htmlFor="name">Question</label>
-        <TextareaAutosize
-          value={ques}
-          onChange={(e) => setQues(e.target.value)}
-          type="text"
-          name="question"
-          required={true}
-        />
-      </section>
-      <section className="ans">
-        <label htmlFor="name">Answer</label>
-        <TextareaAutosize
-          value={ans}
-          onChange={(e) => setAns(e.target.value)}
-          type="text"
-          name="answer"
-          required={true}
-        />
-      </section>
-      <button className="submit">Save</button>
-      <section className="pBtm" />
+    <>
+      <form onSubmit={submit}>
+        <section>
+          <label htmlFor="name">Question</label>
+          <TextareaAutosize
+            value={ques}
+            onChange={(e) => setQues(e.target.value)}
+            type="text"
+            name="question"
+            required={true}
+          />
+        </section>
+        <section className="ans">
+          <label htmlFor="name">Answer</label>
+          <TextareaAutosize
+            value={ans}
+            onChange={(e) => setAns(e.target.value)}
+            type="text"
+            name="answer"
+            required={true}
+          />
+        </section>
+        <button className="submit">Save</button>
+        <section className="pBtm" />
+      </form>
+      {loading && (
+        <div className="spinnerContainer">
+          <div className="spinner" />
+        </div>
+      )}
       <Modal open={msg} className="msg">
         {msg}
       </Modal>
-    </form>
+    </>
   );
 };
 const SingleFaq = ({ faq, setFaqs }) => {
@@ -454,17 +468,13 @@ const SingleFaq = ({ faq, setFaqs }) => {
         <td>{faq.ques}</td>
         <td>{faq.ans}</td>
       </tr>
-      <Modal open={view} className="faq formModal">
-        <div className="head">
-          <p className="modalName">FAQ</p>
-          <button
-            onClick={() => {
-              setView(false);
-            }}
-          >
-            <X_svg />
-          </button>
-        </div>
+      <Modal
+        open={view}
+        head={true}
+        label="FAQ"
+        setOpen={setView}
+        className="faq formModal"
+      >
         <div className="content">
           <h3>{faq.ques}</h3>
           <p>{faq.ans}</p>
@@ -502,13 +512,13 @@ const SingleFaq = ({ faq, setFaqs }) => {
       <Modal open={msg} className="msg">
         {msg}
       </Modal>
-      <Modal open={formOpen} className="formModal faqForm">
-        <div className="head">
-          <p className="modalName">Add FAQ</p>
-          <button onClick={() => setFormOpen(false)}>
-            <X_svg />
-          </button>
-        </div>
+      <Modal
+        open={formOpen}
+        head={true}
+        label="Add FAQ"
+        setOpen={setFormOpen}
+        className="formModal faqForm"
+      >
         <FaqForm
           edit={faq}
           onSuccess={(newFaq) => {
@@ -1008,38 +1018,21 @@ export const SingleTicket = ({ history, match }) => {
                 </div>
                 <p className="message">{item.message.body}</p>
                 {item.message.files.length > 0 && (
-                  <div className="files">test</div>
+                  <div className="thumbs">
+                    <Media links={item.message.files} />
+                  </div>
                 )}
               </li>
             ))}
           </ul>
         </div>
-        <Modal open={replyForm} className="formModal ticketReplyFormModal">
-          <div className="head">
-            <p className="modalName">Add reply to Ticket</p>
-            <button onClick={() => setReplyForm(false)}>
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="15.557"
-                height="15.557"
-                viewBox="0 0 15.557 15.557"
-              >
-                <defs>
-                  <clipPath id="clip-path">
-                    <rect width="15.557" height="15.557" fill="none" />
-                  </clipPath>
-                </defs>
-                <g id="Cancel" clipPath="url(#clip-path)">
-                  <path
-                    id="Union_3"
-                    data-name="Union 3"
-                    d="M7.778,9.192,1.414,15.557,0,14.142,6.364,7.778,0,1.414,1.414,0,7.778,6.364,14.142,0l1.415,1.414L9.192,7.778l6.364,6.364-1.415,1.415Z"
-                    fill="#2699fb"
-                  />
-                </g>
-              </svg>
-            </button>
-          </div>
+        <Modal
+          open={replyForm}
+          head={true}
+          lable="Add reply to Ticket"
+          setOpen={setReplyForm}
+          className="formModal ticketReplyFormModal"
+        >
           <TicketReplyForm
             _id={ticket._id}
             onSuccess={(newTicket) => {
@@ -1064,8 +1057,90 @@ export const SingleTicket = ({ history, match }) => {
     );
   }
   return (
-    <div className="ticket">
-      loading
+    <div className="ticket loading">
+      <div className="detail">
+        <Link to="/account/support/ticket" className="back">
+          <Arrow_left_svg />
+          Go Back
+        </Link>
+        <ul className="summery">
+          <li className="head">Ticket Summery</li>
+          <li>
+            <label></label>
+            <p></p>
+          </li>
+          <li>
+            <label></label>
+            <p></p>
+          </li>
+          <li>
+            <label></label>
+            <p></p>
+          </li>
+        </ul>
+        <ul className="milestoneDetail">
+          <li className="head">Milestone Detail</li>
+          <li>
+            <label></label>
+            <p></p>
+          </li>
+          <li>
+            <label></label>
+            <p></p>
+          </li>
+          <li>
+            <label></label>
+            <p></p>
+          </li>
+        </ul>
+        <ul className="transactionDetail">
+          <li className="head">Transaction Detail</li>
+          <li>
+            <label></label>
+            <p></p>
+          </li>
+          <li>
+            <label></label>
+            <p></p>
+          </li>
+          <li>
+            <label></label>
+            <p></p>
+          </li>
+        </ul>
+      </div>
+      <div className="messages">
+        <div className="head">Messages</div>
+        <ul>
+          <li>
+            <div className="user">
+              <div className="img" />
+              <p className="name" />
+            </div>
+            <p className="message">
+              <span />
+            </p>
+            <div className="thumbs">
+              <div className="img" />
+              <div className="img" />
+            </div>
+          </li>
+          <li>
+            <div className="user">
+              <div className="img" />
+              <p className="name" />
+            </div>
+            <p className="message">
+              <span />
+            </p>
+            <div className="thumbs">
+              <div className="img" />
+              <div className="img" />
+              <div className="img" />
+            </div>
+          </li>
+        </ul>
+      </div>
       <Modal open={msg} className="msg">
         {msg}
       </Modal>
@@ -1073,23 +1148,25 @@ export const SingleTicket = ({ history, match }) => {
   );
 };
 export const TicketReplyForm = ({ _id, onSuccess }) => {
+  const [loading, setLoading] = useState(false);
   const [msg, setMsg] = useState(false);
-  const [caseFiles, setCaseFiles] = useState("");
+  const [files, setFiles] = useState("");
   const [message, setMessage] = useState("");
-  const submit = (e) => {
+  const submit = async (e) => {
     e.preventDefault();
-    // upload files here.
-    const files = [];
+    setLoading(true);
+    const fileLinks = files.length ? await UploadFiles({ files, setMsg }) : [];
     fetch("/api/addTicketReply", {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         _id,
-        message: { body: message, files },
+        message: { body: message, files: fileLinks },
       }),
     })
       .then((res) => res.json())
       .then((data) => {
+        setLoading(false);
         if (data.code === "ok") {
           onSuccess?.(data.ticket);
         } else {
@@ -1105,6 +1182,7 @@ export const TicketReplyForm = ({ _id, onSuccess }) => {
         }
       })
       .catch((err) => {
+        setLoading(false);
         console.log(err);
         setMsg(
           <>
@@ -1128,23 +1206,12 @@ export const TicketReplyForm = ({ _id, onSuccess }) => {
             onChange={(e) => setMessage(e.target.value)}
           />
         </section>
-        <section className="fileInput">
-          <label htmlFor="for">Upload relevant files (optional)</label>
-          {caseFiles.length > 0 && (
-            <ul>
-              {caseFiles.map((file, i) => (
-                <li key={i}>{file.name}</li>
-              ))}
-            </ul>
-          )}
-          <input
-            type="file"
-            name="files"
+        <section>
+          <label>Upload relevant files (optional)</label>
+          <FileInput
             accept="audio/*,video/*,image/*"
             multiple={true}
-            onChange={(e) => {
-              setCaseFiles(Object.values(e.target.files));
-            }}
+            onChange={(files) => setFiles(files)}
           />
         </section>
         <button className="submit" type="submit">
@@ -1152,6 +1219,11 @@ export const TicketReplyForm = ({ _id, onSuccess }) => {
         </button>
         <div className="pBtm" />
       </form>
+      {loading && (
+        <div className="spinnerContainer">
+          <div className="spinner" />
+        </div>
+      )}
       <Modal open={msg} className="msg">
         {msg}
       </Modal>
@@ -1418,13 +1490,13 @@ export const ContactRequest = ({ history, location, pathname }) => {
           }}
         />
       </Modal>
-      <Modal open={fullRequest} className="formModal singleContact">
-        <div className="head">
-          <p className="modalName">Add FAQ</p>
-          <button onClick={() => setFullRequest(null)}>
-            <X_svg />
-          </button>
-        </div>
+      <Modal
+        open={fullRequest}
+        head={true}
+        setOpen={setFullRequest}
+        label="Contact Request"
+        className="formModal singleContact"
+      >
         <div className="content">
           <div className="user">
             {fullRequest?.name}
@@ -1756,13 +1828,13 @@ export const WorkRequest = ({ history, location, pathname }) => {
           }}
         />
       </Modal>
-      <Modal open={fullRequest} className="formModal singleContact">
-        <div className="head">
-          <p className="modalName">Add FAQ</p>
-          <button onClick={() => setFullRequest(null)}>
-            <X_svg />
-          </button>
-        </div>
+      <Modal
+        open={fullRequest}
+        head={true}
+        label="Work Request"
+        setOpen={setFullRequest}
+        className="formModal singleContact"
+      >
         <div className="content">
           <div className="user">
             {fullRequest?.firstName + " " + fullRequest?.lastName}

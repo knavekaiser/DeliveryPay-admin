@@ -335,6 +335,7 @@ const Settings = ({ history, match, location }) => {
 
 const DataEdit = ({ label, fields, value, onError }) => {
   const { setUser } = useContext(SiteContext);
+  const [loading, setLoading] = useState(false);
   const [edit, setEdit] = useState(false);
   const form = useRef(null);
   const submit = (e) => {
@@ -360,6 +361,7 @@ const DataEdit = ({ label, fields, value, onError }) => {
     if (allData.phone) {
       allData.phone = "+91" + allData.phone.replace(/^\+?9?1?/, "");
     }
+    setLoading(true);
     fetch("/api/editAdminProfile", {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
@@ -367,6 +369,7 @@ const DataEdit = ({ label, fields, value, onError }) => {
     })
       .then((res) => res.json())
       .then(({ user }) => {
+        setLoading(false);
         if (user) {
           setUser(user);
           setEdit(false);
@@ -375,6 +378,7 @@ const DataEdit = ({ label, fields, value, onError }) => {
         }
       })
       .catch((err) => {
+        setLoading(false);
         console.log(err);
         alert("someting went wrong");
       });
@@ -391,7 +395,7 @@ const DataEdit = ({ label, fields, value, onError }) => {
         <div className="btns">
           {edit ? (
             <>
-              <button key="submit" type="submit">
+              <button key="submit" type="submit" disabled={loading}>
                 Save changes
               </button>
               <button key="cancel" type="button" onClick={() => setEdit(false)}>

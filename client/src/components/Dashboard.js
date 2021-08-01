@@ -430,7 +430,7 @@ function Dashboard({ location }) {
               <Link
                 to="/dashboard/support/tickets"
                 className={`${
-                  location.pathname.startsWith("/dashboard/support/tickets")
+                  location.pathname.startsWith("/dashboard/support/ticket")
                     ? "active"
                     : ""
                 }`}

@@ -1,49 +1,53 @@
 import React, { useEffect, forwardRef } from "react";
 import ReactDOM from "react-dom";
 import { createPortal } from "react-dom";
+import { X_svg } from "./Elements";
 
-export const Modal = forwardRef(
-  (
-    {
-      containerClass,
-      open,
-      setOpen,
-      children,
-      className,
-      onBackdropClick,
-      backdropClass,
-      style,
-    },
-    ref
-  ) => {
-    useEffect(() => {
-      if (!containerClass) return;
-      const portal = document.querySelector("#portal");
-      portal.classList.add(containerClass);
-      return () => portal.classList.remove(containerClass);
-    });
-    if (!open) return null;
-    return createPortal(
-      <>
-        <div
-          className={`modalBackdrop ${backdropClass}`}
-          onClick={() => {
-            setOpen?.(false);
-            onBackdropClick?.();
-          }}
-        />
-        <div
-          ref={ref}
-          style={{ ...style }}
-          className={`modal ${className ? className : ""}`}
-        >
-          {children}
-        </div>
-      </>,
-      document.querySelector("#portal")
-    );
-  }
-);
+export const Modal = ({
+  containerClass,
+  open,
+  setOpen,
+  children,
+  className,
+  onBackdropClick,
+  backdropClass,
+  style,
+  head,
+  label,
+}) => {
+  useEffect(() => {
+    if (!containerClass) return;
+    const portal = document.querySelector("#portal");
+    portal.classList.add(containerClass);
+    return () => portal.classList.remove(containerClass);
+  });
+  if (!open) return null;
+  return createPortal(
+    <>
+      <div
+        className={`modalBackdrop ${backdropClass}`}
+        onClick={() => {
+          onBackdropClick?.();
+        }}
+      />
+      <div
+        style={{ ...style }}
+        className={`modal ${className ? className : ""}`}
+      >
+        {head && (
+          <div className="head">
+            <p className="modalName">{label}</p>
+            <button onClick={() => setOpen?.(false)}>
+              <X_svg />
+            </button>
+          </div>
+        )}
+        {children}
+      </div>
+    </>,
+    document.querySelector("#portal")
+  );
+};
 
 export const Confirm = ({ className, label, question, callback }) => {
   const cleanup = () =>

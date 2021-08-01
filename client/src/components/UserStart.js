@@ -40,9 +40,13 @@ const RegisterForm = () => {
         if (data.user) {
           setUser(user);
           history.push("/dashboard/home");
-        } else if (data.code === 11000) {
-          setErrMsg("Email/Phone already exists.");
+        } else if (data.code === 409) {
+          setErrMsg("Phone already exists.");
         }
+      })
+      .catch((err) => {
+        console.log(err);
+        setErrMsg("Could not register. Make sure you're online.");
       });
   };
   useEffect(() => {

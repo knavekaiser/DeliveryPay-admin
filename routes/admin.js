@@ -35,9 +35,10 @@ app.post("/api/registerAdmin", (req, res) => {
         }
       })
       .catch((err) => {
+        console.log(err);
         if (err.code === 11000) {
           res.status(409).json({
-            message: "phone or email already exists",
+            message: "phone already exists",
             code: 409,
             success: false,
           });

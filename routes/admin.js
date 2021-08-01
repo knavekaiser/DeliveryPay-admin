@@ -13,8 +13,8 @@ async function verify(token) {
 }
 
 app.post("/api/registerAdmin", (req, res) => {
-  const { name, phone, email, password } = req.body;
-  if (name && phone && email && password) {
+  const { name, phone, password } = req.body;
+  if (name && phone && password) {
     bcrypt
       .hash(password, 10)
       .then((hash) => {

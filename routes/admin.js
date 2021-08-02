@@ -12,55 +12,55 @@ async function verify(token) {
   return adminid || null;
 }
 
-app.post("/api/registerAdmin", (req, res) => {
-  const { name, phone, password } = req.body;
-  if (name && phone && password) {
-    bcrypt
-      .hash(password, 10)
-      .then((hash) => {
-        return new Admin({
-          ...req.body,
-          pass: hash,
-        }).save();
-      })
-      .then((dbRes) => {
-        if (dbRes) {
-          signingIn(dbRes._doc, res);
-        } else {
-          res.status(500).json({
-            code: 500,
-            message: "Cound not save to database",
-            success: false,
-          });
-        }
-      })
-      .catch((err) => {
-        console.log(err);
-        if (err.code === 11000) {
-          res.status(409).json({
-            message: "phone already exists",
-            code: 409,
-            success: false,
-          });
-        } else {
-          console.log(err);
-          res.status(500).json({
-            code: 500,
-            message: "database error",
-            success: false,
-          });
-        }
-      });
-  } else {
-    res.status(400).json({
-      code: 400,
-      message: "missing fields",
-      requiredFileds: "name, phone, email, password",
-      fieldsFound: req.body,
-      success: false,
-    });
-  }
-});
+// app.post("/api/registerAdmin", (req, res) => {
+//   const { name, phone, password } = req.body;
+//   if (name && phone && password) {
+//     bcrypt
+//       .hash(password, 10)
+//       .then((hash) => {
+//         return new Admin({
+//           ...req.body,
+//           pass: hash,
+//         }).save();
+//       })
+//       .then((dbRes) => {
+//         if (dbRes) {
+//           signingIn(dbRes._doc, res);
+//         } else {
+//           res.status(500).json({
+//             code: 500,
+//             message: "Cound not save to database",
+//             success: false,
+//           });
+//         }
+//       })
+//       .catch((err) => {
+//         console.log(err);
+//         if (err.code === 11000) {
+//           res.status(409).json({
+//             message: "phone already exists",
+//             code: 409,
+//             success: false,
+//           });
+//         } else {
+//           console.log(err);
+//           res.status(500).json({
+//             code: 500,
+//             message: "database error",
+//             success: false,
+//           });
+//         }
+//       });
+//   } else {
+//     res.status(400).json({
+//       code: 400,
+//       message: "missing fields",
+//       requiredFileds: "name, phone, email, password",
+//       fieldsFound: req.body,
+//       success: false,
+//     });
+//   }
+// });
 app.post(
   "/api/adminLogin",
   passport.authenticate("admin", { session: false, failWithError: true }),

@@ -192,15 +192,17 @@ const LoginForm = () => {
         alt="Delivery pay logo"
       />
       <p className="title">Login as Admin</p>
-      <p className="links">
-        Don't have an account? <Link to="/join">Register</Link>
-      </p>
+      {
+        //   <p className="links">
+        //   Don't have an account? <Link to="/join">Register</Link>
+        // </p>
+      }
       <form onSubmit={submit}>
         <input
           type="text"
           name="username"
           required={true}
-          placeholder="Email  or Phone Number"
+          placeholder="Email"
           value={username}
           onChange={(e) => {
             setInvadilCred(false);
@@ -546,9 +548,11 @@ function UserStart() {
         </div>
         <div className="forms">
           <Switch>
-            <Route path="/join">
-              <RegisterForm />
-            </Route>
+            {
+              //   <Route path="/join">
+              //   <RegisterForm />
+              // </Route>
+            }
             <Route path="/resetPassword">
               <PasswordReset />
             </Route>

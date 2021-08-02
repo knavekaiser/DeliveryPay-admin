@@ -31,7 +31,7 @@ app.get(
         {
           $group: {
             _id: null,
-            total: { $sum: "$amount" },
+            total: { $sum: { $abs: "$amount" } },
           },
         },
       ]),

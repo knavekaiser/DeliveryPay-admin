@@ -59,6 +59,7 @@ app.get(
       });
   }
 );
+
 app.get(
   "/api/transactions",
   passport.authenticate("adminPrivate"),
@@ -276,6 +277,57 @@ app.get(
       .catch((err) => {
         console.log(err);
         res.status(500).json({ code: 500, message: "database error" });
+      });
+  }
+);
+
+app.post(
+  "/api/downloadPayout",
+  passport.authenticate("adminPrivate"),
+  (req, res) => {
+    const { startDate, endDate } = req.body;
+    const query = {
+      releaseDate: {
+        $gte: new Date(startDate),
+        $lt: new Date(endDate),
+      },
+      status: "released",
+    };
+    Milestone.aggregate([
+      { $match: query },
+      {
+        $lookup: {
+          from: "users",
+          localField: "seller._id",
+          foreignField: "_id",
+          as: "seller",
+        },
+      },
+      { $set: { seller: { $first: "$seller" } } },
+      {
+        $group: {
+          _id: "$seller._id",
+          amount: { $sum: "$amount" },
+          phone: { $first: "$seller.phone" },
+          "Account Holder Name": {
+            $first: "$seller.shopInfo.paymentMethod.name",
+          },
+          "Account Type": {
+            $first: "$seller.shopInfo.paymentMethod.accountType",
+          },
+          "Bank Name": { $first: "$seller.shopInfo.paymentMethod.bank" },
+          IFSC: { $first: "$seller.shopInfo.paymentMethod.ifsc" },
+          City: { $first: "$seller.shopInfo.paymentMethod.city" },
+        },
+      },
+      { $sort: { bank: 1, amount: -1 } },
+      { $project: { _id: 0 } },
+    ])
+      .then((dbRes) => {
+        res.json({ code: "ok", users: dbRes });
+      })
+      .catch((err) => {
+        res.status(500).json({ code: 500, message: "Database error" });
       });
   }
 );

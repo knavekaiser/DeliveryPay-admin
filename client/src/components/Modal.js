@@ -30,10 +30,7 @@ export const Modal = ({
           onBackdropClick?.();
         }}
       />
-      <div
-        style={{ ...style }}
-        className={`modal ${className ? className : ""}`}
-      >
+      <div style={{ ...style }} className={`modal ${className || ""}`}>
         {head && (
           <div className="head">
             <p className="modalName">{label}</p>

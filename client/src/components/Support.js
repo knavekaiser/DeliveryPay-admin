@@ -187,7 +187,7 @@ export const Faqs = ({ history, location, pathname }) => {
             </>
           )}
         </section>
-        <section className="addFaq">
+        <section className="add">
           <button onClick={() => setFaqForm(true)}>
             <Plus_svg />
             Add FAQ
@@ -459,10 +459,10 @@ const SingleFaq = ({ faq, setFaqs }) => {
           <Moment format="DD MMM, YYYY. hh:mm a">{faq.createdAt}</Moment>
         </td>
         <td className="user">
-          <img src={faq.author.profileImg || "/profile-user.jpg"} />
+          <img src={faq.author?.profileImg || "/profile-user.jpg"} />
           <p className="name">
-            {faq.author.name}
-            <span className="phone">{faq.author.phone}</span>
+            {faq.author?.name}
+            <span className="phone">{faq.author?.phone}</span>
           </p>
         </td>
         <td>{faq.ques}</td>

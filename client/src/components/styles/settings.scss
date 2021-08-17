@@ -187,3 +187,37 @@
   }
   padding-bottom: 8rem;
 }
+
+@media only screen and (max-width: 480px) {
+  .settingsContainer {
+    .settings {
+      ul {
+        li {
+          padding: 1.25rem 0;
+          flex-direction: column;
+          grid-gap: 0.2rem;
+          align-items: flex-start;
+          .label {
+            margin-bottom: 0.2rem;
+          }
+          form {
+            width: 100%;
+            grid-gap: 1rem;
+            align-items: flex-start;
+            flex-direction: column;
+            .inputs,
+            .currentValue {
+              flex: 1;
+              width: 100%;
+            }
+            .btns {
+              align-self: flex-end;
+              display: flex;
+              width: max-content;
+            }
+          }
+        }
+      }
+    }
+  }
+}

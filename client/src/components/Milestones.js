@@ -4,58 +4,49 @@ import {
   Err_svg,
   Paginaiton,
   Chev_down_svg,
+  Arrow_down_svg,
   X_svg,
+  InputDateRange,
 } from "./Elements";
-import { Modal } from "./Modal";
+import { Modal, Confirm } from "./Modal";
 import Moment from "react-moment";
 import "react-date-range/dist/styles.css";
 import "react-date-range/dist/theme/default.css";
-import { DateRange } from "react-date-range";
 import moment from "moment";
+import { CSVLink } from "react-csv";
 require("./styles/transactions.scss");
 
 function Milestones({ history, location, pathname }) {
-  const dateFilterRef = useRef();
   const [msg, setMsg] = useState(null);
   const [total, setTotal] = useState(0);
   const [miles, setMiles] = useState([]);
   const [sort, setSort] = useState({ column: "createdAt", order: "dsc" });
-  const [dateRange, setDateRange] = useState({
-    startDate: new Date(),
-    endDate: new Date(),
-  });
+  const [dateRange, setDateRange] = useState(null);
   const [status, setStatus] = useState("");
   const [dateOpen, setDateOpen] = useState(false);
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState("");
   const [perPage, setPerPage] = useState(20);
-  const [datePickerStyle, setDatePickerStyle] = useState({});
-  const [dateFilter, setDateFilter] = useState(false);
-  useLayoutEffect(() => {
-    const {
-      height,
-      y,
-      width,
-      x,
-    } = dateFilterRef.current.getBoundingClientRect();
-    setDatePickerStyle({
-      position: "fixed",
-      top: height + y + 4,
-      right: window.innerWidth - x - width,
-    });
-  }, []);
+  const [payout, setPayout] = useState(false);
   useEffect(() => {
-    const startDate = moment(dateRange.startDate).format("YYYY-MM-DD");
-    const endDate = moment(dateRange.endDate).format("YYYY-MM-DD");
+    const startDate = moment(dateRange?.startDate).format("YYYY-MM-DD");
+    const endDate = moment(dateRange?.endDate).format("YYYY-MM-DD");
     const lastDate = moment(
-      new Date(dateRange.endDate).setDate(dateRange.endDate.getDate() + 1)
+      new Date(dateRange?.endDate).setDate(dateRange?.endDate.getDate() + 1)
     ).format("YYYY-MM-DD");
     fetch(
-      `/api/milestones?page=${page}&perPage=${perPage}&sort=${
-        sort.column
-      }&order=${sort.order}${search && "&q=" + search}${
-        dateFilter ? "&dateFrom=" + startDate + "&dateTo=" + lastDate : ""
-      }${status && "&status=" + status}`
+      `/api/milestones?${new URLSearchParams({
+        page,
+        perPage,
+        sort: sort.column,
+        order: sort.order,
+        ...(search && { q: search }),
+        ...(dateRange && {
+          dateFrom: startDate,
+          dateTo: lastDate,
+        }),
+        ...(status && { status }),
+      }).toString()}`
     )
       .then((res) => res.json())
       .then((data) => {
@@ -86,7 +77,7 @@ function Milestones({ history, location, pathname }) {
           </>
         );
       });
-  }, [page, perPage, sort.column, sort.order, search, dateFilter, status]);
+  }, [page, perPage, sort.column, sort.order, search, dateRange, status]);
   return (
     <div className="table milestoneContainer">
       <div style={{ display: "none" }}>
@@ -150,49 +141,19 @@ function Milestones({ history, location, pathname }) {
             onChange={(e) => setStatus(e.value)}
           />
         </section>
-        <section
-          className={`date ${dateFilter ? "open" : ""}`}
-          ref={dateFilterRef}
-          onClick={() => setDateOpen(true)}
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="30.971"
-            height="30.971"
-            viewBox="0 0 30.971 30.971"
+        <InputDateRange
+          onChange={(range) => {
+            setDateRange(range);
+          }}
+        />
+        <section className="add">
+          <button
+            onClick={() => {
+              setPayout(true);
+            }}
           >
-            <path
-              id="Path_299"
-              data-name="Path 299"
-              d="M3.992,2.42H6.775V.968a.968.968,0,1,1,1.936,0V2.42H22.26V.968a.968.968,0,1,1,1.936,0V2.42h2.783a4,4,0,0,1,3.992,3.992V26.978a4,4,0,0,1-3.992,3.992H3.992A4,4,0,0,1,0,26.978V6.412A4,4,0,0,1,3.992,2.42ZM26.978,4.355H24.2v.968a.968.968,0,1,1-1.936,0V4.355H8.71v.968a.968.968,0,1,1-1.936,0V4.355H3.992A2.059,2.059,0,0,0,1.936,6.412v2.3h27.1v-2.3A2.059,2.059,0,0,0,26.978,4.355ZM3.992,29.035H26.978a2.059,2.059,0,0,0,2.057-2.057V10.646H1.936V26.978A2.059,2.059,0,0,0,3.992,29.035Z"
-              fill="#336cf9"
-            />
-          </svg>
-          {dateFilter && (
-            <>
-              <div className="dates">
-                <p>
-                  From:{" "}
-                  <Moment format="DD MMM, YYYY">{dateRange.startDate}</Moment>
-                </p>
-                <p>
-                  To: <Moment format="DD MMM, YYYY">{dateRange.endDate}</Moment>
-                </p>
-              </div>
-              <button
-                className="clearDateFilter"
-                onClick={() => {
-                  setDateRange({
-                    startDate: new Date(),
-                    endDate: new Date(),
-                  });
-                  setDateFilter(false);
-                }}
-              >
-                <X_svg />
-              </button>
-            </>
-          )}
+            <Arrow_down_svg /> Download Payout Sheet
+          </button>
         </section>
       </div>
       <table cellSpacing={0} cellPadding={0}>
@@ -209,7 +170,7 @@ function Milestones({ history, location, pathname }) {
                 }));
               }}
             >
-              Date <Chev_down_svg />
+              Created At <Chev_down_svg />
             </th>
             <th
               className={
@@ -275,10 +236,10 @@ function Milestones({ history, location, pathname }) {
           {miles.map((item) => (
             <tr key={item._id}>
               <td>
-                <Moment format="DD MMM, YYYY. hh:mm a">{item.createdAt}</Moment>
+                <Moment format="DD-MM-YYYY hh:mm a">{item.createdAt}</Moment>
               </td>
               <td className="user">
-                <img src={item.buyer.profileImg || "/profile-user.jpg"} />
+                <img src={item.seller.profileImg || "/profile-user.jpg"} />
                 <p className="name">
                   {item.seller.firstName + " " + item.seller.lastName}
                   <span className="phone">{item.seller.phone}</span>
@@ -305,13 +266,15 @@ function Milestones({ history, location, pathname }) {
         </tbody>
         <tfoot>
           <tr>
-            <Paginaiton
-              total={total}
-              perPage={perPage}
-              currentPage={page}
-              btns={5}
-              setPage={setPage}
-            />
+            <td>
+              <Paginaiton
+                total={total}
+                perPage={perPage}
+                currentPage={page}
+                btns={5}
+                setPage={setPage}
+              />
+            </td>
           </tr>
         </tfoot>
       </table>
@@ -319,25 +282,144 @@ function Milestones({ history, location, pathname }) {
         {msg}
       </Modal>
       <Modal
-        open={dateOpen}
-        onBackdropClick={() => setDateOpen(false)}
-        backdropClass="datePicker"
-        style={datePickerStyle}
+        head={true}
+        label="Download Payout"
+        open={payout}
+        setOpen={setPayout}
+        className="payoutSheet"
       >
-        <DateRange
-          className="dateRange"
-          ranges={[dateRange]}
-          onChange={(e) => {
-            setDateRange(e.range1);
-            if (e.range1.endDate !== e.range1.startDate) {
-              setDateOpen(false);
-              setDateFilter(true);
-            }
+        <PayoutModal
+          onSuccess={() => {
+            setPayout(false);
           }}
         />
       </Modal>
     </div>
   );
 }
+
+const PayoutModal = ({ onSuccess }) => {
+  const [dateRange, setDateRange] = useState(null);
+  const [msg, setMsg] = useState(null);
+  const [csvReport, setCsvReport] = useState(null);
+  const downloadBtn = useRef();
+  return (
+    <div className="content">
+      <p>Select dates below</p>
+      <InputDateRange
+        onChange={(range) => {
+          setDateRange(range);
+        }}
+      />
+      <div className="actions">
+        <button
+          disabled={!dateRange}
+          onClick={() => {
+            const startDate = moment(dateRange?.startDate).format("YYYY-MM-DD");
+            const endDate = moment(dateRange?.endDate).format("YYYY-MM-DD");
+            const lastDate = moment(
+              new Date(dateRange?.endDate).setDate(
+                dateRange?.endDate.getDate() + 1
+              )
+            ).format("YYYY-MM-DD");
+            Confirm({
+              label: "Download Payout Sheet",
+              question: (
+                <>
+                  You sure want to download all milestones released{" "}
+                  {dateRange?.startDate.toString() !==
+                  dateRange?.endDate.toString() ? (
+                    <>
+                      between{" "}
+                      <Moment format="DD MMM YYYY">
+                        {dateRange.startDate}
+                      </Moment>{" "}
+                      to{" "}
+                      <Moment format="DD MMM YYYY">{dateRange.endDate}</Moment>
+                    </>
+                  ) : (
+                    <>
+                      on{" "}
+                      <Moment format="DD MMM YYYY">
+                        {dateRange.startDate}
+                      </Moment>
+                    </>
+                  )}
+                  ?
+                </>
+              ),
+              callback: () => {
+                fetch("/api/downloadPayout", {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({
+                    startDate: startDate,
+                    endDate: lastDate,
+                  }),
+                })
+                  .then((res) => res.json())
+                  .then((data) => {
+                    if (data.code === "ok") {
+                      const headers = Object.keys(data.users[0]).map(
+                        (item) => ({
+                          label: item,
+                          key: item,
+                        })
+                      );
+                      setCsvReport({
+                        headers,
+                        data: data.users,
+                        filename: `Delivery Pay payout sheet, ${startDate}-${endDate}.csv`,
+                      });
+                    } else {
+                      setMsg(
+                        <>
+                          <button onClick={() => setMsg(null)}>Okay</button>
+                          <div>
+                            <Err_svg />
+                            <h4>Could not get milestones. Try again.</h4>
+                          </div>
+                        </>
+                      );
+                    }
+                  })
+                  .catch((err) => {
+                    console.log(err);
+                    setMsg(
+                      <>
+                        <button onClick={() => setMsg(null)}>Okay</button>
+                        <div>
+                          <Err_svg />
+                          <h4>
+                            Could not get milestones. Make sure you're online.
+                          </h4>
+                        </div>
+                      </>
+                    );
+                  });
+              },
+            });
+          }}
+        >
+          Generate report
+        </button>
+        {csvReport && (
+          <CSVLink
+            ref={downloadBtn}
+            {...csvReport}
+            onClick={() => {
+              setCsvReport(null);
+            }}
+          >
+            Download Report
+          </CSVLink>
+        )}
+      </div>
+      <Modal open={msg} className="msg">
+        {msg}
+      </Modal>
+    </div>
+  );
+};
 
 export default Milestones;

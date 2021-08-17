@@ -10,6 +10,8 @@ import tick from "../tick.svg";
 import tick_border from "../tick_border.svg";
 import { Modal } from "./Modal";
 import { Link, useHistory } from "react-router-dom";
+import Moment from "react-moment";
+import { DateRange } from "react-date-range";
 require("./styles/elements.scss");
 
 export const Err_svg = () => {
@@ -728,6 +730,8 @@ export const Combobox = ({
   const [value, setValue] = useState(() => {
     if (defaultValue > -1 && options[defaultValue]) {
       return options[defaultValue].label;
+    } else if (options.find((item) => item.value === defaultValue)) {
+      return options.find((item) => item.value === defaultValue).label;
     } else if (typeof defaultValue === "object") {
       return defaultValue;
     } else {
@@ -739,7 +743,6 @@ export const Combobox = ({
   const [optionsStyle, setOptionsStyle] = useState({});
   const input = useRef();
   const section = useRef();
-  const listItemRef = useRef();
   useLayoutEffect(() => {
     const { width, height, x, y } = section.current.getBoundingClientRect();
     setOptionsStyle({
@@ -747,7 +750,7 @@ export const Combobox = ({
       left: x,
       top: y + height,
       width: width,
-      height: listItemRef.current?.clientHeight * options.length || 41,
+      height: 37 * options.length,
       maxHeight: window.innerHeight - (y + height) - 16,
     });
   }, [open]);
@@ -761,8 +764,7 @@ export const Combobox = ({
       <input
         ref={input}
         required={required}
-        data={data}
-        value={value}
+        value={value || ""}
         onFocus={(e) => e.target.blur()}
         onChange={() => {}}
       />
@@ -812,7 +814,6 @@ export const Combobox = ({
         >
           {options.map((option) => (
             <li
-              ref={listItemRef}
               key={option.label}
               onClick={(e) => {
                 setData(option.value);
@@ -959,24 +960,124 @@ export const FileInput = ({
           </div>
         );
       })}
-      <div className="uploadBtn">
-        <Plus_svg />
-        <input
-          type="file"
-          multiple={multiple}
-          required={required}
-          accept={accept}
+      {(files.length === 0 || multiple) && (
+        <div className="uploadBtn">
+          <Plus_svg />
+          <input
+            type="file"
+            multiple={multiple}
+            required={required}
+            accept={accept}
+            onChange={(e) => {
+              setFiles((prev) => [
+                ...prev,
+                ...[...e.target.files].filter(
+                  (item) => !files.some((file) => file.name === item.name)
+                ),
+              ]);
+            }}
+          />
+        </div>
+      )}
+    </section>
+  );
+};
+
+export const InputDateRange = ({ onChange }) => {
+  const dateFilterRef = useRef();
+  const [dateRange, setDateRange] = useState({
+    startDate: new Date(),
+    endDate: new Date(),
+  });
+  const [datePickerStyle, setDatePickerStyle] = useState({});
+  const [dateFilter, setDateFilter] = useState(false);
+  const [open, setOpen] = useState(false);
+  useLayoutEffect(() => {
+    const {
+      height,
+      y,
+      width,
+      x,
+    } = dateFilterRef.current.getBoundingClientRect();
+    setDatePickerStyle({
+      position: "fixed",
+      top: height + y + 4,
+      right: window.innerWidth - x - width,
+    });
+  }, [open]);
+  useEffect(() => {
+    if (dateFilter) {
+      onChange?.(dateRange);
+    } else {
+      onChange?.(null);
+    }
+  }, [dateRange]);
+  return (
+    <>
+      <section
+        className={`date ${dateFilter ? "open" : ""}`}
+        ref={dateFilterRef}
+        onClick={() => setOpen(true)}
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="30.971"
+          height="30.971"
+          viewBox="0 0 30.971 30.971"
+        >
+          <path
+            id="Path_299"
+            data-name="Path 299"
+            d="M3.992,2.42H6.775V.968a.968.968,0,1,1,1.936,0V2.42H22.26V.968a.968.968,0,1,1,1.936,0V2.42h2.783a4,4,0,0,1,3.992,3.992V26.978a4,4,0,0,1-3.992,3.992H3.992A4,4,0,0,1,0,26.978V6.412A4,4,0,0,1,3.992,2.42ZM26.978,4.355H24.2v.968a.968.968,0,1,1-1.936,0V4.355H8.71v.968a.968.968,0,1,1-1.936,0V4.355H3.992A2.059,2.059,0,0,0,1.936,6.412v2.3h27.1v-2.3A2.059,2.059,0,0,0,26.978,4.355ZM3.992,29.035H26.978a2.059,2.059,0,0,0,2.057-2.057V10.646H1.936V26.978A2.059,2.059,0,0,0,3.992,29.035Z"
+            fill="#336cf9"
+          />
+        </svg>
+        {dateFilter && (
+          <>
+            <div className="dates">
+              <p>
+                From:{" "}
+                <Moment format="DD MMM, YYYY">{dateRange.startDate}</Moment>
+              </p>
+              <p>
+                To: <Moment format="DD MMM, YYYY">{dateRange.endDate}</Moment>
+              </p>
+            </div>
+            <button
+              className="clearDateFilter"
+              onClick={() => {
+                setDateRange({
+                  startDate: new Date(),
+                  endDate: new Date(),
+                });
+                setDateFilter(false);
+              }}
+            >
+              <X_svg />
+            </button>
+          </>
+        )}
+      </section>
+      <Modal
+        open={open}
+        onBackdropClick={() => setOpen(false)}
+        backdropClass="datePicker"
+        className="datePicker"
+        style={datePickerStyle}
+      >
+        <DateRange
+          className="dateRange"
+          ranges={[dateRange]}
           onChange={(e) => {
-            setFiles((prev) => [
-              ...prev,
-              ...[...e.target.files].filter(
-                (item) => !files.some((file) => file.name === item.name)
-              ),
-            ]);
+            setDateRange(e.range1);
+            if (e.range1.endDate !== e.range1.startDate) {
+              setOpen(false);
+              setDateFilter(true);
+            }
           }}
         />
-      </div>
-    </section>
+      </Modal>
+    </>
   );
 };
 
@@ -1202,5 +1303,59 @@ export const Media = ({ links }) => {
         <div className="thumbs">{medias}</div>
       </Modal>
     </>
+  );
+};
+
+export const Actions = ({
+  icon,
+  children,
+  className,
+  wrapperClassName,
+  clickable,
+  onClick,
+}) => {
+  const [open, setOpen] = useState(false);
+  const [style, setStyle] = useState({});
+  const buttonRef = useRef();
+  useLayoutEffect(() => {
+    const { height, y, width, x } = buttonRef.current?.getBoundingClientRect();
+    setStyle({
+      position: "fixed",
+      top: height + y + 4,
+      right: window.innerWidth - x - width,
+    });
+  }, [open]);
+  return (
+    <div className={`actions ${className || ""}`}>
+      <button
+        type="button"
+        className="btn"
+        ref={buttonRef}
+        onClick={(e) => {
+          e.stopPropagation();
+          setOpen(true);
+          onClick?.();
+        }}
+      >
+        {icon || <img src="/menu_dot.png" />}
+      </button>
+      <Modal
+        className="actions"
+        backdropClass="actionsBackdrop"
+        open={open}
+        style={style}
+        onBackdropClick={() => setOpen(false)}
+      >
+        <ul
+          className={wrapperClassName}
+          onClick={(e) => {
+            e.stopPropagation();
+            !clickable && setOpen(false);
+          }}
+        >
+          {children}
+        </ul>
+      </Modal>
+    </div>
   );
 };

@@ -14,7 +14,7 @@ const chatModel = new Schema(
         { timestamps: true }
       ),
     ],
-    lastSeen: { type: Date, default: Date.now },
+    lastSeen: { type: Date, default: null },
   },
   { timestamps: true }
 );

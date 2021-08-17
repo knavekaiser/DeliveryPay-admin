@@ -29,6 +29,10 @@ const adminModel = new Schema(
           title: { type: String, required: true },
           body: { type: String, required: true },
           link: { type: String },
+          expireAt: {
+            type: Date,
+            default: new Date().getTime() + 1000 * 60 * 60 * 24 * 14,
+          },
         },
         { timestamps: true }
       ),
@@ -52,7 +56,6 @@ const userModel = new Schema(
       type: String,
       trim: true,
       unique: true,
-      sparse: true,
     },
     balance: { type: Number, default: 0 },
     email: { type: String, unique: true, sparse: true },
@@ -83,25 +86,57 @@ const userModel = new Schema(
         _id: { type: Schema.Types.ObjectId, ref: "User" },
         status: {
           type: String,
-          enum: ["pending", "connected", "silent", "blocked"],
+          enum: ["pending", "connected", "silent"],
           default: "connected",
         },
       },
     ],
+    blockList: [{ type: Schema.Types.ObjectId, ref: "User" }],
     chats: [{ type: Schema.Types.ObjectId, ref: "Chat" }],
-    rewards: [{}],
+    rewards: [{ type: Schema.Types.ObjectId, ref: "Reward" }],
     notifications: [
       new Schema(
         {
           title: { type: String, required: true },
           body: { type: String, required: true },
           link: { type: String },
+          expireAt: {
+            type: Date,
+            default: new Date().getTime() + 1000 * 60 * 60 * 24 * 14,
+          },
         },
         { timestamps: true }
       ),
     ],
+    notificationLastRead: { type: Date },
     paymentMethods: [{ type: Schema.Types.ObjectId, ref: "PaymentMethod" }],
     profileImg: { type: String, default: "/profile-user.jpg" },
+    kyc: {
+      verified: { type: Boolean, default: false },
+      files: [{ type: String }],
+    },
+    gst: {
+      verified: { type: Boolean, default: false },
+      detail: {
+        reg: { type: String },
+        files: [{ type: String }],
+      },
+      amount: { type: Number },
+    },
+    shopInfo: {
+      shippingCost: { type: Number },
+      deliveryWithin: { type: Number },
+      refundable: { type: String },
+      terms: [{ type: String }],
+      paymentMethod: {
+        name: { type: String },
+        bank: { type: String },
+        city: { type: String },
+        accountType: { type: String },
+        accountNumber: { type: String },
+        ifsc: { type: String },
+      },
+    },
   },
   { timestamps: true }
 );
@@ -135,3 +170,16 @@ const OTPModel = new Schema(
   { timestamp: true }
 );
 global.OTP = mongoose.model("OTP", OTPModel);
+
+const notificationModel = new Schema(
+  {
+    title: { type: String, required: true },
+    body: { type: String, required: true },
+    icon: { type: String },
+    image: { type: String },
+    url: { type: String },
+    pushed: { type: Number, default: 0 },
+  },
+  { timestamps: true }
+);
+global.Notification = mongoose.model("Notification", notificationModel);

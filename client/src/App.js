@@ -18,6 +18,10 @@ function resizeWindow() {
   document.body.style.setProperty("--vh", `${vh}px`);
 }
 
+Number.prototype.fix = function (p) {
+  return +this.toFixed(p || 2);
+};
+
 function ProtectedRoute({ children, path, component }) {
   const { user } = useContext(SiteContext);
   const history = useHistory();

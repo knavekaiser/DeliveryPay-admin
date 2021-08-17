@@ -11,10 +11,12 @@ global.fetch = require("node-fetch");
 require("./models/user");
 require("./models/dispute");
 require("./models/payment");
+require("./models/product");
 require("./models/chat");
 require("./models/support");
 require("dotenv").config();
 require("./mailService");
+require("./smsService");
 const PORT = process.env.PORT || 3002;
 const URI = process.env.MONGO_URI;
 const Razorpay = require("razorpay");
@@ -109,7 +111,9 @@ require("./routes/admin.js");
 require("./routes/disputes.js");
 require("./routes/chats.js");
 require("./routes/data.js");
+require("./routes/userManagement.js");
 require("./routes/support.js");
+require("./routes/notifications.js");
 
 // notification
 app.post(

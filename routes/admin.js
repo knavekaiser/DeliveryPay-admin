@@ -256,11 +256,34 @@ app.post("/api/sendAdminForgotPassOTP", async (req, res) => {
                   .status(500)
                   .json({ code: 500, message: "Could not send Email" });
               });
-          } else if (true) {
-            // send text massage or email here
-            res.json({
-              message: "6 digit code has been sent, enter it within 2 minutes",
-            });
+          } else if (phone) {
+            sendSms({
+              to: [phone.replace("+91", "")],
+              otp: true,
+              message: 127687,
+              variables_values: code,
+            })
+              .then((smsRes) => {
+                console.log(smsRes);
+                if (smsRes.return === true) {
+                  res.json({
+                    code: "ok",
+                    message:
+                      "6 digit code has been sent, enter it within 2 minutes",
+                  });
+                } else {
+                  res.status(424).json({
+                    code: 424,
+                    message: smsRes.message,
+                  });
+                }
+              })
+              .catch((err) => {
+                console.log(err);
+                res
+                  .status(500)
+                  .json({ code: 424, message: "Could not send SMS" });
+              });
           }
         } else {
           res.status(500).json({ code: 500, message: "database error" });

@@ -15,7 +15,9 @@ import { GoogleLogout } from "react-google-login";
 import Transactions from "./Transactions";
 import Milestones from "./Milestones";
 import Settings from "./Settings";
+import Notifications from "./notification";
 import Disputes, { SingleDispute } from "./Disputes";
+import Users from "./Users";
 import {
   Faqs,
   Tickets,
@@ -24,6 +26,7 @@ import {
   WorkRequest,
 } from "./Support";
 import Moment from "react-moment";
+
 require("./styles/dashboard.scss");
 
 const ProfileAvatar = () => {
@@ -210,10 +213,12 @@ const Home = () => {
   }, []);
   return (
     <div className="homeContainer">
-      <div className="totalBalance">
-        <p>Total balance in wallet</p>
-        <h1>₹ {data.totalBalance || 0}</h1>
-      </div>
+      {
+        //   <div className="totalBalance">
+        //   <p>Total balance in wallet</p>
+        //   <h1>₹ {(data.totalBalance || 0).fix()}</h1>
+        // </div>
+      }
       <div className="total">
         <p>Total milestone in progress.</p>
         <h3>{data.activeMilestones || 0}</h3>
@@ -229,7 +234,7 @@ const Home = () => {
             <Moment format="MMM, YYYY">{new Date()}</Moment>
           </span>
         </p>
-        <h3>{data.transactionThisMonth || 0}</h3>
+        <h3>{data.transactionThisMonth?.fix() || 0}</h3>
       </div>
       <div className="recentTrans">
         <p>Latest Transactions</p>
@@ -247,7 +252,7 @@ const Home = () => {
                 </p>
               </div>
               <div className="amount">
-                <h4>₹ {item.amount}</h4>
+                <h4>₹ {item.amount.fix()}</h4>
               </div>
             </li>
           )) || <li>Nothing for now</li>}
@@ -354,6 +359,20 @@ function Dashboard({ location }) {
         </li>
         <li
           className={
+            location.pathname.startsWith("/dashboard/users")
+              ? "active"
+              : undefined
+          }
+        >
+          <Link to="/dashboard/users">
+            <div className="icon">
+              <img src="/deal.png" />
+            </div>
+            <p className="label">Users</p>
+          </Link>
+        </li>
+        <li
+          className={
             location.pathname.startsWith("/dashboard/disputes")
               ? "active"
               : undefined
@@ -364,6 +383,20 @@ function Dashboard({ location }) {
               <img src="/deal.png" />
             </div>
             <p className="label">Disputes</p>
+          </Link>
+        </li>
+        <li
+          className={`notifications ${
+            location.pathname.startsWith("/dashboard/pushNotificaitons")
+              ? "active"
+              : undefined
+          }`}
+        >
+          <Link to="/dashboard/pushNotificaitons">
+            <div className="icon">
+              <img src="/setting.png" />
+            </div>
+            <p className="label">Push Notifications</p>
           </Link>
         </li>
         <li
@@ -493,6 +526,12 @@ function Dashboard({ location }) {
         <Switch>
           <Route path="/dashboard/milestones" component={Milestones} />
           <Route path="/dashboard/transactions" component={Transactions} />
+          <Route
+            path="/dashboard/pushNotificaitons"
+            component={Notifications}
+          />
+          <Route path="/dashboard/users" component={Users} />
+          <Route exact path="/dashboard/disputes" component={Disputes} />
           <Route path="/dashboard/support/faq" component={Faqs} />
           <Route
             path="/dashboard/support/ticket/:_id"
@@ -513,7 +552,6 @@ function Dashboard({ location }) {
             path="/dashboard/disputes/:_id"
             component={SingleDispute}
           />
-          <Route exact path="/dashboard/disputes" component={Disputes} />
           <Route path="/" component={Home} />
         </Switch>
       </main>

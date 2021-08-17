@@ -1,13 +1,12 @@
 import { useState, useEffect, useContext, useRef, useCallback } from "react";
 import { SiteContext } from "../SiteContext";
-// import { BankCard, BankAccount, BankCardForm, NetBankingForm } from "./Wallet";
 import { Modal, Confirm } from "./Modal";
 import { Err_svg, Succ_svg } from "./Elements";
 import GoogleLogin from "react-google-login";
 require("./styles/settings.scss");
 
 async function updateProfileInfo(newData) {
-  return fetch("/api/editUserProfile", {
+  return fetch("/api/editAdminProfile", {
     method: "PATCH",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(newData),
@@ -119,15 +118,54 @@ const Settings = ({ history, match, location }) => {
             accept=".jpg, .png, .jpeg"
             onChange={(e) => {
               const file = e.target.files[0];
+              const cdn = process.env.REACT_APP_CDN_HOST;
               if (file) {
-                const tempUrl = URL.createObjectURL(e.target.files[0]);
-                setUser((prev) => ({ ...prev, profileImg: tempUrl }));
-                // const imgLink = ""; upload image here
-                // updateProfileInfo({ profileImg: imgLink }).then((img) => {
-                //   if (user) {
-                //     setUser(user);
-                //   }
-                // });
+                let imgLink = "";
+                const formData = new FormData();
+                for (var _file of e.target.files) {
+                  formData.append("file", _file);
+                }
+                fetch(`${cdn}/upload`, {
+                  method: "POST",
+                  body: formData,
+                })
+                  .then((res) => res.json())
+                  .then((data) => {
+                    if (data.code === "ok") {
+                      imgLink = cdn + "/" + data.files[0];
+                      updateProfileInfo({ profileImg: imgLink }).then(
+                        (data) => {
+                          if (data.user) {
+                            setUser((prev) => ({
+                              ...prev,
+                              profileImg: data.user.profileImg,
+                            }));
+                          }
+                        }
+                      );
+                    } else {
+                      setMsg(
+                        <>
+                          <button onClick={() => setMsg(null)}>Okay</button>
+                          <div>
+                            <Err_svg />
+                            <h4>Image upload failed</h4>
+                          </div>
+                        </>
+                      );
+                    }
+                  })
+                  .catch((err) => {
+                    setMsg(
+                      <>
+                        <button onClick={() => setMsg(null)}>Okay</button>
+                        <div>
+                          <Err_svg />
+                          <h4>Image upload failed. Make sure you're online.</h4>
+                        </div>
+                      </>
+                    );
+                  });
               }
             }}
           />

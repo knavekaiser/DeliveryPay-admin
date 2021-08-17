@@ -1,32 +1,9 @@
 @import "variables";
 
 .formModal {
-  border-radius: 0.7rem;
-  width: 100%;
   display: grid;
   overflow: auto;
   position: relative;
-  .head {
-    position: sticky;
-    top: 0;
-    z-index: 10;
-    background: white;
-    display: flex;
-    justify-content: space-between;
-    padding: 1.3rem;
-    box-shadow: 0 0 0.7rem rgba(0, 0, 0, 0.25);
-    border-radius: 0.7rem 0.7rem 0 0;
-    .modalName {
-      color: $blue;
-      font-weight: 500;
-    }
-    button {
-      border: none;
-      outline: none;
-      background: none;
-      cursor: pointer;
-    }
-  }
   form {
     flex-wrap: wrap;
     padding: 1.5rem;
@@ -85,6 +62,35 @@
       }
     }
   }
+}
+.modal {
+  border-radius: 0.7rem;
+  width: 100%;
+  .head {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background: white;
+    display: flex;
+    justify-content: space-between;
+    padding: 1.3rem;
+    box-shadow: 0 0 0.7rem rgba(0, 0, 0, 0.25);
+    border-radius: 0.7rem 0.7rem 0 0;
+    .modalName {
+      color: $blue;
+      font-weight: 500;
+    }
+    button {
+      border: none;
+      outline: none;
+      background: none;
+      cursor: pointer;
+    }
+  }
+}
+
+.pushNotificaiton {
+  max-width: 25rem;
 }
 
 .faqForm {

@@ -113,6 +113,9 @@ global.BankAccount = PaymentMethod.discriminator(
     ifsc: { type: String },
     bank: { type: String },
     accountNumber: { type: String, required: true },
+    type: { type: String },
+    ifsc: { type: String, required: true },
+    city: { type: String },
   })
 );
 global.VpaAccount = PaymentMethod.discriminator(

@@ -309,13 +309,15 @@ function Disputes({ history, location, match }) {
         </tbody>
         <tfoot>
           <tr>
-            <Paginaiton
-              total={total}
-              perPage={perPage}
-              currentPage={page}
-              btns={5}
-              setPage={setPage}
-            />
+            <td>
+              <Paginaiton
+                total={total}
+                perPage={perPage}
+                currentPage={page}
+                btns={5}
+                setPage={setPage}
+              />
+            </td>
           </tr>
         </tfoot>
       </table>

@@ -243,10 +243,11 @@ const Home = () => {
           {data.recentTrans?.map((item) => (
             <li key={item._id}>
               <div className="transDetail">
-                <Img src={item.user?.profileImg} />
+                <Img src={item.user?.profileImg || "/profile-user.jpg"} />
                 <p className="name">
-                  {item.user?.firstName + " " + item.user?.lastName ||
-                    "Deleted user"}
+                  {item.user
+                    ? item.user?.firstName + " " + item.user?.lastName
+                    : "Deleted user"}
                   <Moment className="date" format="MMM DD, YYYY">
                     {item.createdAt}
                   </Moment>

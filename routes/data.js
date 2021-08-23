@@ -71,9 +71,23 @@ app.get(
     const query = {
       ...(q && {
         $or: [
-          { "user.firstName": new RegExp(q, "gi") },
-          { "user.phone": new RegExp(q, "gi") },
-          { note: new RegExp(q, "gi") },
+          {
+            $expr: {
+              $regexMatch: {
+                input: {
+                  $concat: [
+                    "$user.firstName",
+                    " ",
+                    "$user.lastName",
+                    " ",
+                    "$user.phone",
+                  ],
+                },
+                regex: new RegExp(q.replace(/[#-.]|[[-^]|[?|{}]/g, "\\$&")),
+                options: "i",
+              },
+            },
+          },
           ...(ObjectId.isValid(q) ? [{ _id: ObjectId(q) }] : []),
         ],
       }),
@@ -156,10 +170,29 @@ app.get(
     const query = {
       ...(q && {
         $or: [
-          { "seller.firstName": new RegExp(q, "gi") },
-          { "seller.phone": new RegExp(q, "gi") },
-          { "buyer.firstName": new RegExp(q, "gi") },
-          { "buyer.phone": new RegExp(q, "gi") },
+          {
+            $expr: {
+              $regexMatch: {
+                input: {
+                  $concat: [
+                    "$seller.firstName",
+                    " ",
+                    "$seller.lastName",
+                    " ",
+                    "$seller.phone",
+                    " ",
+                    "$buyer.firstName",
+                    " ",
+                    "$buyer.lastName",
+                    " ",
+                    "$buyer.phone",
+                  ],
+                },
+                regex: new RegExp(q.replace(/[#-.]|[[-^]|[?|{}]/g, "\\$&")),
+                options: "i",
+              },
+            },
+          },
           ...(ObjectId.isValid(q) ? [{ _id: ObjectId(q) }] : []),
         ],
       }),

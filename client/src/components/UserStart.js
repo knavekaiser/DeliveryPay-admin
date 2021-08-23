@@ -1,7 +1,7 @@
 import { useState, useEffect, useContext, useRef } from "react";
 import { SiteContext } from "../SiteContext";
 import { Route, Switch, useHistory, useLocation, Link } from "react-router-dom";
-import { Checkbox, Header, Footer } from "./Elements";
+import { Checkbox, Header, Footer, Img } from "./Elements";
 import { GoogleLogin } from "react-google-login";
 require("./styles/userStart.scss");
 
@@ -54,7 +54,7 @@ const RegisterForm = () => {
   }, [confirm_pass]);
   return (
     <div className="formWrapper">
-      <img
+      <Img
         className="logo"
         onClick={() => history.push("")}
         src="/logo_benner.jpg"
@@ -185,7 +185,7 @@ const LoginForm = () => {
   };
   return (
     <div className="formWrapper login">
-      <img
+      <Img
         className="logo"
         onClick={() => history.push("")}
         src="/logo_benner.jpg"
@@ -351,7 +351,7 @@ const PasswordReset = () => {
   }, [code]);
   return (
     <div className="formWrapper resetPass">
-      <img className="logo" src="/logo_benner.jpg" alt="Delivery pay logo" />
+      <Img className="logo" src="/logo_benner.jpg" alt="Delivery pay logo" />
       <p className="title">Password reset</p>
       <p className="links">
         Already have an account?<Link to="/login">Login</Link>
@@ -540,7 +540,7 @@ function UserStart() {
             <h3>This section is only for Admins</h3>
             <p>Make sure you know what you're doing.</p>
           </div>
-          <img
+          <Img
             className="illustration"
             src="/landingPage_illustration.png"
             alt="illustration"

@@ -1,7 +1,7 @@
 import { useState, useEffect, useContext, useRef, useCallback } from "react";
 import { SiteContext } from "../SiteContext";
 import { Modal, Confirm } from "./Modal";
-import { Err_svg, Succ_svg } from "./Elements";
+import { Err_svg, Succ_svg, Img } from "./Elements";
 import GoogleLogin from "react-google-login";
 require("./styles/settings.scss");
 
@@ -89,7 +89,7 @@ const Settings = ({ history, match, location }) => {
     <div className="settingsContainer">
       <div className="benner">
         <div className="profileImg">
-          <img src={user.profileImg || "/profile-user.jpg"} />
+          <Img src={user.profileImg || "/profile-user.jpg"} />
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="91.832"
@@ -371,6 +371,41 @@ const Settings = ({ history, match, location }) => {
   );
 };
 
+export const SiteSettings = ({ history, match, location }) => {
+  const { config } = useContext(SiteContext);
+  const [msg, setMsg] = useState(null);
+  return (
+    <div className="settingsContainer">
+      <div className="settings">
+        <div className="head">Site Settings</div>
+        <ul>
+          <SiteDataEdit
+            label="Delivery Pay Fee"
+            fields={
+              <>
+                <section>
+                  <input
+                    type="number"
+                    step="0.10"
+                    placeholder="Delivery Pay fee"
+                    defaultValue={config.fee}
+                    name="fee"
+                    required={true}
+                  />
+                </section>
+              </>
+            }
+            value={(config.fee || 0) + "%"}
+          />
+        </ul>
+      </div>
+      <Modal className="msg" open={msg}>
+        {msg}
+      </Modal>
+    </div>
+  );
+};
+
 const DataEdit = ({ label, fields, value, onError }) => {
   const { setUser } = useContext(SiteContext);
   const [loading, setLoading] = useState(false);
@@ -410,6 +445,68 @@ const DataEdit = ({ label, fields, value, onError }) => {
         setLoading(false);
         if (user) {
           setUser(user);
+          setEdit(false);
+        } else {
+          alert("someting went wrong");
+        }
+      })
+      .catch((err) => {
+        setLoading(false);
+        console.log(err);
+        alert("someting went wrong");
+      });
+  };
+  return (
+    <li>
+      <p className="label">{label}</p>
+      <form ref={form} onSubmit={submit}>
+        {edit ? (
+          <div className="inputs">{fields}</div>
+        ) : (
+          <p className="currentValue">{value}</p>
+        )}
+        <div className="btns">
+          {edit ? (
+            <>
+              <button key="submit" type="submit" disabled={loading}>
+                Save changes
+              </button>
+              <button key="cancel" type="button" onClick={() => setEdit(false)}>
+                Cancel
+              </button>
+            </>
+          ) : (
+            <button key="edit" type="button" onClick={() => setEdit(true)}>
+              Edit
+            </button>
+          )}
+        </div>
+      </form>
+    </li>
+  );
+};
+const SiteDataEdit = ({ label, fields, value, onError }) => {
+  const { setConfig } = useContext(SiteContext);
+  const [loading, setLoading] = useState(false);
+  const [edit, setEdit] = useState(false);
+  const form = useRef(null);
+  const submit = (e) => {
+    e.preventDefault();
+    const allData = {};
+    for (var [field, value] of new FormData(e.target).entries()) {
+      allData[field] = value;
+    }
+    setLoading(true);
+    fetch("/api/updateSiteConfig", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(allData),
+    })
+      .then((res) => res.json())
+      .then(({ config }) => {
+        setLoading(false);
+        if (config) {
+          setConfig(config);
           setEdit(false);
         } else {
           alert("someting went wrong");

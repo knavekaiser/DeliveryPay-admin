@@ -5,6 +5,7 @@ import {
   Paginaiton,
   Chev_down_svg,
   X_svg,
+  Img,
 } from "./Elements";
 import { Modal } from "./Modal";
 import Moment from "react-moment";
@@ -247,7 +248,7 @@ function Transactions({ history, location, pathname }) {
                 <Moment format="DD MMM, YYYY. hh:mm a">{item.createdAt}</Moment>
               </td>
               <td className="user">
-                <img src={item.user?.profileImg || "/profile-user.jpg"} />
+                <Img src={item.user?.profileImg || "/profile-user.jpg"} />
                 <p className="name">
                   {item.user
                     ? item.user?.firstName + " " + item.user?.lastName
@@ -257,7 +258,7 @@ function Transactions({ history, location, pathname }) {
               </td>
               <td>{item._id}</td>
               <td>{item.note}</td>
-              <td>₹ {item.amount}</td>
+              <td>₹ {item.amount.fix()}</td>
             </tr>
           ))}
           {trans.length === 0 && (

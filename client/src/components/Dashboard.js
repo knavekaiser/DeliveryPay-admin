@@ -10,14 +10,15 @@ import {
   X_svg,
   Plus_svg,
   Minus_svg,
+  Img,
 } from "./Elements";
 import { GoogleLogout } from "react-google-login";
 import Transactions from "./Transactions";
 import Milestones from "./Milestones";
-import Settings from "./Settings";
+import Settings, { SiteSettings } from "./Settings";
 import Notifications from "./notification";
 import Disputes, { SingleDispute } from "./Disputes";
-import Users from "./Users";
+import Users, { FullUser } from "./Users";
 import {
   Faqs,
   Tickets,
@@ -91,9 +92,9 @@ const ProfileAvatar = () => {
           className={`bell ${unread ? "unread" : ""}`}
           onClick={() => setNoti(true)}
         >
-          <img src="/notification-bell.png" />
+          <Img src="/notification-bell.png" />
         </button>
-        <img
+        <Img
           src={user?.profileImg}
           className="avatar"
           onClick={() => setMenu(!menu)}
@@ -242,7 +243,7 @@ const Home = () => {
           {data.recentTrans?.map((item) => (
             <li key={item._id}>
               <div className="transDetail">
-                <img src={item.user?.profileImg} />
+                <Img src={item.user?.profileImg} />
                 <p className="name">
                   {item.user?.firstName + " " + item.user?.lastName ||
                     "Deleted user"}
@@ -282,7 +283,7 @@ function Dashboard({ location }) {
         onClick={(e) => setSidebarOpen(false)}
       >
         <li>
-          <img className="logo" src="/logo_land.jpg" alt="Delivery pay logo" />
+          <Img className="logo" src="/logo_land.jpg" alt="Delivery pay logo" />
         </li>
         <li
           className={
@@ -294,7 +295,7 @@ function Dashboard({ location }) {
         >
           <Link to="/dashboard/home">
             <div className="icon">
-              <img src="/dashboard.png" />
+              <Img src="/dashboard.png" />
             </div>
             <p className="label">Home</p>
           </Link>
@@ -308,7 +309,7 @@ function Dashboard({ location }) {
         >
           <Link to="/dashboard/milestones">
             <div className="icon">
-              <img src="/buyer.png" />
+              <Img src="/buyer.png" />
             </div>
             <p className="label">Milestones</p>
           </Link>
@@ -323,7 +324,7 @@ function Dashboard({ location }) {
           // >
           //   <Link to="/dashboard/seller">
           //     <div className="icon">
-          //       <img src="/seller.png" />
+          //       <Img src="/seller.png" />
           //     </div>
           //     <p className="label">Seller</p>
           //   </Link>
@@ -337,7 +338,7 @@ function Dashboard({ location }) {
           // >
           //   <Link to="/dashboard/buyer">
           //     <div className="icon">
-          //       <img src="/buyer.png" />
+          //       <Img src="/buyer.png" />
           //     </div>
           //     <p className="label">Buyer</p>
           //   </Link>
@@ -352,7 +353,7 @@ function Dashboard({ location }) {
         >
           <Link to="/dashboard/transactions">
             <div className="icon">
-              <img src="/transaction.png" />
+              <Img src="/transaction.png" />
             </div>
             <p className="label">Transactions</p>
           </Link>
@@ -366,7 +367,7 @@ function Dashboard({ location }) {
         >
           <Link to="/dashboard/users">
             <div className="icon">
-              <img src="/deal.png" />
+              <Img src="/deal.png" />
             </div>
             <p className="label">Users</p>
           </Link>
@@ -380,7 +381,7 @@ function Dashboard({ location }) {
         >
           <Link to="/dashboard/disputes">
             <div className="icon">
-              <img src="/deal.png" />
+              <Img src="/deal.png" />
             </div>
             <p className="label">Disputes</p>
           </Link>
@@ -394,7 +395,7 @@ function Dashboard({ location }) {
         >
           <Link to="/dashboard/pushNotificaitons">
             <div className="icon">
-              <img src="/setting.png" />
+              <Img src="/setting.png" />
             </div>
             <p className="label">Push Notifications</p>
           </Link>
@@ -408,9 +409,23 @@ function Dashboard({ location }) {
         >
           <Link to="/dashboard/settings">
             <div className="icon">
-              <img src="/setting.png" />
+              <Img src="/setting.png" />
             </div>
             <p className="label">Settings</p>
+          </Link>
+        </li>
+        <li
+          className={`settings ${
+            location.pathname.startsWith("/dashboard/siteSettings")
+              ? "active"
+              : undefined
+          }`}
+        >
+          <Link to="/dashboard/siteSettings">
+            <div className="icon">
+              <Img src="/setting.png" />
+            </div>
+            <p className="label">Site Settings</p>
           </Link>
         </li>
         {
@@ -421,7 +436,7 @@ function Dashboard({ location }) {
           // >
           //   <Link to="/dashboard/analytics">
           //     <div className="icon">
-          //       <img src="/analytics.png" />
+          //       <Img src="/analytics.png" />
           //     </div>
           //     <p className="label">Analytics</p>
           //   </Link>
@@ -435,7 +450,7 @@ function Dashboard({ location }) {
           label={
             <>
               <div className="icon">
-                <img src="/customer-support.png" />
+                <Img src="/customer-support.png" />
               </div>
               <p className="label">Customer Support</p>
             </>
@@ -454,7 +469,7 @@ function Dashboard({ location }) {
                 }`}
               >
                 <div className="icon">
-                  <img src="/message.png" />
+                  <Img src="/message.png" />
                 </div>
                 <p className="label">FAQ Blogs</p>
               </Link>
@@ -469,7 +484,7 @@ function Dashboard({ location }) {
                 }`}
               >
                 <div className="icon">
-                  <img src="/tickets.png" />
+                  <Img src="/tickets.png" />
                 </div>
                 <p className="label">Tickets</p>
               </Link>
@@ -484,7 +499,7 @@ function Dashboard({ location }) {
                 }`}
               >
                 <div className="icon">
-                  <img src="/cargo.png" />
+                  <Img src="/cargo.png" />
                 </div>
                 <p className="label">Job Application</p>
               </Link>
@@ -501,7 +516,7 @@ function Dashboard({ location }) {
                 }`}
               >
                 <div className="icon">
-                  <img src="/cargo.png" />
+                  <Img src="/cargo.png" />
                 </div>
                 <p className="label">Contact Request</p>
               </Link>
@@ -518,7 +533,7 @@ function Dashboard({ location }) {
       <main>
         <header>
           <button className="menuBtn" onClick={() => setSidebarOpen(true)}>
-            <img src="/menu.svg" />
+            <Img src="/menu.svg" />
           </button>
           <h3>Now Pay after Delivery with Delivery Pay</h3>
           <ProfileAvatar />
@@ -530,6 +545,7 @@ function Dashboard({ location }) {
             path="/dashboard/pushNotificaitons"
             component={Notifications}
           />
+          <Route path="/dashboard/users/:_id" component={FullUser} />
           <Route path="/dashboard/users" component={Users} />
           <Route exact path="/dashboard/disputes" component={Disputes} />
           <Route path="/dashboard/support/faq" component={Faqs} />
@@ -543,6 +559,7 @@ function Dashboard({ location }) {
             component={WorkRequest}
           />
           <Route path="/dashboard/settings" component={Settings} />
+          <Route path="/dashboard/siteSettings" component={SiteSettings} />
           <Route
             path="/dashboard/support/contactRequest"
             component={ContactRequest}

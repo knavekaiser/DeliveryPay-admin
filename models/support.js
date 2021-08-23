@@ -66,3 +66,24 @@ const faqModel = new Schema(
   { timestamps: true }
 );
 global.Faq = mongoose.model("Faq", faqModel);
+
+const configModel = new Schema(
+  {
+    fee: { type: Number, required: true },
+  },
+  { timestamps: true }
+);
+global.Config = mongoose.model("Config", configModel);
+
+const bugModel = new Schema(
+  {
+    name: { type: String },
+    message: { type: String },
+    dscr: { componentStack: { type: String } },
+    detail: { type: String },
+    url: { type: String },
+    files: [{ type: String }],
+  },
+  { timestamps: true }
+);
+global.Bug = mongoose.model("Bug", bugModel);

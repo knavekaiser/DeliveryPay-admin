@@ -5,27 +5,28 @@ app.get("/api/users", passport.authenticate("adminPrivate"), (req, res) => {
   };
   const query = {
     ...(q && {
-      $expr: {
-        $regexMatch: {
-          input: {
-            $concat: [
-              "$firstName",
-              " ",
-              "$lastName",
-              " ",
-              "$userId",
-              " ",
-              "$phone",
-              " ",
-              "$email",
-            ],
+      $or: [
+        {
+          $expr: {
+            $regexMatch: {
+              input: {
+                $concat: [
+                  "$firstName",
+                  " ",
+                  "$lastName",
+                  " ",
+                  "$userId",
+                  " ",
+                  "$phone",
+                ],
+              },
+              regex: q,
+              options: "i",
+            },
           },
-          regex: q,
-          options: "i",
         },
-        // { "firstName": new RegExp(q, "gi") },
-        // { "phone": new RegExp(q, "gi") },
-      },
+        ...(ObjectId.isValid(q) ? [{ _id: ObjectId(q) }] : []),
+      ],
     }),
     ...(dateFrom &&
       dateTo && {
@@ -35,6 +36,7 @@ app.get("/api/users", passport.authenticate("adminPrivate"), (req, res) => {
         },
       }),
   };
+  console.log(query, q, ObjectId.isValid(q));
   User.aggregate([
     { $match: query },
     { $sort: sortOrder },

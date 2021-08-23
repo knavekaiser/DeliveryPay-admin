@@ -583,9 +583,15 @@
   max-width: 40rem;
   border-radius: 1rem;
   overflow: auto;
+  display: flex;
+  flex-direction: column-reverse;
+  position: relative;
   .chatHead {
-    position: sticky;
+    position: fixed;
     top: 0;
+    height: min-content;
+    width: 100%;
+    max-width: 40rem;
     padding: 1rem;
     display: flex;
     box-shadow: 0 0 0.5rem rgba(0, 0, 0, 0.15);
@@ -630,14 +636,15 @@
       }
     }
   }
+  .chats {
+    margin-top: 4rem;
+  }
 }
 
 ul.chats {
-  overflow-y: flex;
   padding: 0 1rem;
   display: flex;
-  flex-direction: column;
-  overflow: auto;
+  flex-direction: column-reverse;
   grid-gap: 1px;
   .bubble {
     max-width: 100%;
@@ -917,10 +924,14 @@ ul.chats {
     .date {
       padding: 1rem;
       display: flex;
-      justify-content: space-between;
+      grid-gap: 1rem;
+      // justify-content: space-between;
       align-items: center;
       background: rgba(0, 0, 0, 0.02);
       button {
+        cursor: pointer;
+        margin: auto;
+        margin-right: 0;
         display: grid;
         border: none;
         outline: none;
@@ -943,6 +954,10 @@ ul.chats {
         &:hover {
           color: $blue;
           background: white;
+        }
+        &:disabled {
+          pointer-events: none;
+          filter: grayscale(1);
         }
       }
     }

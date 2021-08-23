@@ -409,3 +409,111 @@ app.delete(
       });
   }
 );
+
+app.get(
+  "/api/viewAllWorkRequest",
+  passport.authenticate("adminPrivate"),
+  (req, res) => {
+    const { q, page, perPage, sort, order, dateFrom, dateTo } = req.query;
+    const sortOrder = {
+      [sort || "createdAt"]: order === "asc" ? 1 : -1,
+    };
+    const query = {
+      ...(q && {
+        $or: [
+          { email: new RegExp(q, "gi") },
+          { phone: new RegExp(q, "gi") },
+          { firstName: new RegExp(q, "gi") },
+        ],
+      }),
+      ...(dateFrom &&
+        dateTo && {
+          createdAt: {
+            $gte: new Date(dateFrom),
+            $lt: new Date(dateTo),
+          },
+        }),
+    };
+    Bug.aggregate([
+      { $match: query },
+      { $sort: sortOrder },
+      {
+        $facet: {
+          requests: [
+            { $skip: +perPage * (+(page || 1) - 1) },
+            { $limit: +(perPage || 20) },
+          ],
+          pageInfo: [{ $group: { _id: null, count: { $sum: 1 } } }],
+        },
+      },
+    ])
+      .then((dbRes) => {
+        res.json({ code: "ok", requests: dbRes[0] });
+      })
+      .catch((err) => {
+        console.log(err);
+        res.status(500).json({ message: "something went wrong" });
+      });
+  }
+);
+app.delete(
+  "/api/deleteWorkRequest",
+  passport.authenticate("adminPrivate"),
+  (req, res) => {
+    Bug.findByIdAndDelete(req.body._id)
+      .then((dbRes) => {
+        if (dbRes) {
+          res.json({ message: "bug deleted" });
+        } else {
+          res.status(400).json({ message: "bad request" });
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+        res.status(500).json({ message: "something went wrong" });
+      });
+  }
+);
+
+app.get(
+  "/api/siteConfig",
+  passport.authenticate("adminPrivate"),
+  (req, res) => {
+    Config.findOne()
+      .then((config) => {
+        res.json({ code: "ok", config });
+      })
+      .catch((err) => {
+        console.log(err);
+        res.status(500).json({ code: 500, message: "something went wrong" });
+      });
+  }
+);
+app.patch(
+  "/api/updateSiteConfig",
+  passport.authenticate("adminPrivate"),
+  (req, res) => {
+    Config.findOneAndUpdate({}, { ...req.body }, { new: true })
+      .then((config) => {
+        if (config) {
+          res.json({ code: "ok", config });
+        } else {
+          new Config({ ...req.body })
+            .save()
+            .then((config) => {
+              res.json({ code: "ok", config });
+            })
+            .catch((err) => {
+              console.log(err);
+              res
+                .status(500)
+                .json({ code: 500, message: "something went wrong" });
+            });
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+        res.status(500).json({ code: 500, message: "something went wrong" });
+      });
+  }
+);

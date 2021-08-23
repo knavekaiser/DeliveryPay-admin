@@ -709,8 +709,8 @@ export const Checkbox = ({ defaultValue, required, onChange }) => {
             onChange?.(e);
           }}
         />
-        <img src={tick_border} />
-        {checked && <img src={tick} />}
+        <Img src={tick_border} />
+        {checked && <Img src={tick} />}
       </div>
     </section>
   );
@@ -952,7 +952,7 @@ export const FileInput = ({
             >
               <X_svg />
             </button>
-            <img
+            <Img
               className={img ? "thumb" : ""}
               src={img ? file.url : "/file_icon.png"}
             />
@@ -1081,6 +1081,19 @@ export const InputDateRange = ({ onChange }) => {
   );
 };
 
+export const Img = ({ src: defaultSrc, onClick, alt, className }) => {
+  const [src, setSrc] = useState(defaultSrc);
+  return (
+    <img
+      src={src}
+      onClick={onClick}
+      onError={() => setSrc("/img_err.png")}
+      alt={alt}
+      className={className || ""}
+    />
+  );
+};
+
 export const Paginaiton = ({
   total,
   btns,
@@ -1151,7 +1164,7 @@ export const Header = () => {
   return (
     <header>
       <Link className="logoLink" to="/">
-        <img className="logo" src="/logo_land.jpg" alt="Delivery pay logo" />
+        <Img className="logo" src="/logo_land.jpg" alt="Delivery pay logo" />
       </Link>
       <div className="clas">
         {
@@ -1252,14 +1265,14 @@ export const Media = ({ links }) => {
     };
     if (item.match(/(\.gif|\.png|\.jpg|\.jpeg|\.webp)$/)) {
       thumb = (
-        <img
+        <Img
           className={index === i ? "active" : ""}
           key={i}
           src={item}
           onClick={handleClick}
         />
       );
-      view = <img key={i} src={item} />;
+      view = <Img key={i} src={item} />;
     } else if (item.match(/(\.mp3|\.ogg|\.amr|\.m4a|\.flac|\.wav|\.aac)$/)) {
       thumb = (
         <div
@@ -1267,7 +1280,7 @@ export const Media = ({ links }) => {
           className={`audioThumb ${index === i ? "active" : ""}`}
           onClick={handleClick}
         >
-          <img src="/play_btn.png" />
+          <Img src="/play_btn.png" />
         </div>
       );
       view = <audio key={i} src={item} controls="on" autoPlay="on" />;
@@ -1275,7 +1288,7 @@ export const Media = ({ links }) => {
       thumb = (
         <div key={i} className={`videoThumb ${index === i ? "active" : ""}`}>
           <video src={item} onClick={handleClick} />
-          <img src="/play_btn.png" />
+          <Img src="/play_btn.png" />
         </div>
       );
       view = <video key={i} src={item} controls="on" autoPlay="on" />;
@@ -1337,7 +1350,7 @@ export const Actions = ({
           onClick?.();
         }}
       >
-        {icon || <img src="/menu_dot.png" />}
+        {icon || <Img src="/menu_dot.png" />}
       </button>
       <Modal
         className="actions"

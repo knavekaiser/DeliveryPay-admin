@@ -7,6 +7,7 @@ import {
   Arrow_down_svg,
   X_svg,
   InputDateRange,
+  Img,
 } from "./Elements";
 import { Modal, Confirm } from "./Modal";
 import Moment from "react-moment";
@@ -239,14 +240,14 @@ function Milestones({ history, location, pathname }) {
                 <Moment format="DD-MM-YYYY hh:mm a">{item.createdAt}</Moment>
               </td>
               <td className="user">
-                <img src={item.seller.profileImg || "/profile-user.jpg"} />
+                <Img src={item.seller.profileImg || "/profile-user.jpg"} />
                 <p className="name">
                   {item.seller.firstName + " " + item.seller.lastName}
                   <span className="phone">{item.seller.phone}</span>
                 </p>
               </td>
               <td className="user">
-                <img src={item.buyer.profileImg || "/profile-user.jpg"} />
+                <Img src={item.buyer.profileImg || "/profile-user.jpg"} />
                 <p className="name">
                   {item.buyer.firstName + " " + item.buyer.lastName}
                   <span className="phone">{item.buyer.phone}</span>
@@ -312,97 +313,115 @@ const PayoutModal = ({ onSuccess }) => {
         }}
       />
       <div className="actions">
-        <button
-          disabled={!dateRange}
-          onClick={() => {
-            const startDate = moment(dateRange?.startDate).format("YYYY-MM-DD");
-            const endDate = moment(dateRange?.endDate).format("YYYY-MM-DD");
-            const lastDate = moment(
-              new Date(dateRange?.endDate).setDate(
-                dateRange?.endDate.getDate() + 1
-              )
-            ).format("YYYY-MM-DD");
-            Confirm({
-              label: "Download Payout Sheet",
-              question: (
-                <>
-                  You sure want to download all milestones released{" "}
-                  {dateRange?.startDate.toString() !==
-                  dateRange?.endDate.toString() ? (
-                    <>
-                      between{" "}
-                      <Moment format="DD MMM YYYY">
-                        {dateRange.startDate}
-                      </Moment>{" "}
-                      to{" "}
-                      <Moment format="DD MMM YYYY">{dateRange.endDate}</Moment>
-                    </>
-                  ) : (
-                    <>
-                      on{" "}
-                      <Moment format="DD MMM YYYY">
-                        {dateRange.startDate}
-                      </Moment>
-                    </>
-                  )}
-                  ?
-                </>
-              ),
-              callback: () => {
-                fetch("/api/downloadPayout", {
-                  method: "POST",
-                  headers: { "Content-Type": "application/json" },
-                  body: JSON.stringify({
-                    startDate: startDate,
-                    endDate: lastDate,
-                  }),
-                })
-                  .then((res) => res.json())
-                  .then((data) => {
-                    if (data.code === "ok") {
-                      const headers = Object.keys(data.users[0]).map(
-                        (item) => ({
-                          label: item,
-                          key: item,
-                        })
-                      );
-                      setCsvReport({
-                        headers,
-                        data: data.users,
-                        filename: `Delivery Pay payout sheet, ${startDate}-${endDate}.csv`,
-                      });
-                    } else {
+        {!csvReport && (
+          <button
+            disabled={!dateRange}
+            onClick={() => {
+              const startDate = moment(dateRange?.startDate).format(
+                "YYYY-MM-DD"
+              );
+              const endDate = moment(dateRange?.endDate).format("YYYY-MM-DD");
+              const lastDate = moment(
+                new Date(dateRange?.endDate).setDate(
+                  dateRange?.endDate.getDate() + 1
+                )
+              ).format("YYYY-MM-DD");
+              Confirm({
+                label: "Download Payout Sheet",
+                question: (
+                  <>
+                    You sure want to download all milestones released{" "}
+                    {dateRange?.startDate.toString() !==
+                    dateRange?.endDate.toString() ? (
+                      <>
+                        between{" "}
+                        <Moment format="DD MMM YYYY">
+                          {dateRange.startDate}
+                        </Moment>{" "}
+                        to{" "}
+                        <Moment format="DD MMM YYYY">
+                          {dateRange.endDate}
+                        </Moment>
+                      </>
+                    ) : (
+                      <>
+                        on{" "}
+                        <Moment format="DD MMM YYYY">
+                          {dateRange.startDate}
+                        </Moment>
+                      </>
+                    )}
+                    ?
+                  </>
+                ),
+                callback: () => {
+                  fetch("/api/downloadPayout", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                      startDate: startDate,
+                      endDate: lastDate,
+                    }),
+                  })
+                    .then((res) => res.json())
+                    .then((data) => {
+                      if (data.code === "ok") {
+                        if (data.users.length === 0) {
+                          setMsg(
+                            <>
+                              <button onClick={() => setMsg(null)}>Okay</button>
+                              <div>
+                                <Err_svg />
+                                <h4>No milestones found in selected dates</h4>
+                              </div>
+                            </>
+                          );
+                          return;
+                        }
+                        const headers = Object.keys(data.users[0]).map(
+                          (item) => ({
+                            label: item,
+                            key: item,
+                          })
+                        );
+                        setCsvReport({
+                          headers,
+                          data: data.users,
+                          filename: `Delivery Pay payout sheet, ${startDate}-${endDate}.csv`,
+                        });
+                      } else {
+                        setMsg(
+                          <>
+                            <button onClick={() => setMsg(null)}>Okay</button>
+                            <div>
+                              <Err_svg />
+                              <h4>Could not get milestones. Try again.</h4>
+                            </div>
+                          </>
+                        );
+                      }
+                    })
+                    .catch((err) => {
+                      console.log(err);
                       setMsg(
                         <>
                           <button onClick={() => setMsg(null)}>Okay</button>
                           <div>
                             <Err_svg />
-                            <h4>Could not get milestones. Try again.</h4>
+                            <h4>
+                              Could not get milestones. Make sure you're online.
+                            </h4>
                           </div>
                         </>
                       );
-                    }
-                  })
-                  .catch((err) => {
-                    console.log(err);
-                    setMsg(
-                      <>
-                        <button onClick={() => setMsg(null)}>Okay</button>
-                        <div>
-                          <Err_svg />
-                          <h4>
-                            Could not get milestones. Make sure you're online.
-                          </h4>
-                        </div>
-                      </>
-                    );
-                  });
-              },
-            });
-          }}
-        >
-          Generate report
-        </button>
+                    });
+                },
+              });
+            }}
+          >
+            Generate report
+          </button>
+        )}
         {csvReport && (
           <CSVLink
             ref={downloadBtn}

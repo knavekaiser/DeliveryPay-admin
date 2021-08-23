@@ -14,6 +14,7 @@ import {
   Media,
   UploadFiles,
   FileInput,
+  Img,
 } from "./Elements";
 import moment from "moment";
 import { DateRange } from "react-date-range";
@@ -459,7 +460,7 @@ const SingleFaq = ({ faq, setFaqs }) => {
           <Moment format="DD MMM, YYYY. hh:mm a">{faq.createdAt}</Moment>
         </td>
         <td className="user">
-          <img src={faq.author?.profileImg || "/profile-user.jpg"} />
+          <Img src={faq.author?.profileImg || "/profile-user.jpg"} />
           <p className="name">
             {faq.author?.name}
             <span className="phone">{faq.author?.phone}</span>
@@ -479,7 +480,7 @@ const SingleFaq = ({ faq, setFaqs }) => {
           <h3>{faq.ques}</h3>
           <p>{faq.ans}</p>
           <div className="author">
-            <img src={faq.author?.profileImg || "/profile-user.jpg"} />
+            <Img src={faq.author?.profileImg || "/profile-user.jpg"} />
             <p className="name">
               {faq.author?.name || "Deleted user"}
               <span className="phone">{faq.author?.phone}</span>
@@ -786,7 +787,7 @@ export const Tickets = ({ history, location, pathname }) => {
                 <Moment format="hh:mm a, DD MMM, YYYY">{item.createdAt}</Moment>
               </td>
               <td className="user">
-                <img src={item.user?.profileImg || "/profile-user.jpg"} />
+                <Img src={item.user?.profileImg || "/profile-user.jpg"} />
                 <p className="name">
                   {item.user
                     ? item.user.firstName + " " + item.user.lastName
@@ -1441,7 +1442,7 @@ export const ContactRequest = ({ history, location, pathname }) => {
                 <Moment format="hh:mm a, DD MMM, YYYY">{item.createdAt}</Moment>
               </td>
               <td className="user">
-                <img src={item.user?.profileImg || "/profile-user.jpg"} />
+                <Img src={item.user?.profileImg || "/profile-user.jpg"} />
                 <p className="name">
                   {item.name}
                   <span className="phone">{item.phone}</span>
@@ -1771,7 +1772,7 @@ export const WorkRequest = ({ history, location, pathname }) => {
                 <Moment format="hh:mm a, DD MMM, YYYY">{item.createdAt}</Moment>
               </td>
               <td className="user">
-                <img src={item.user?.profileImg || "/profile-user.jpg"} />
+                <Img src={item.user?.profileImg || "/profile-user.jpg"} />
                 <p className="name">
                   {item.firstName + " " + item.lastName}
                   <span className="phone">{item.phone}</span>

@@ -6,6 +6,7 @@ import {
   Paginaiton,
   Chev_down_svg,
   X_svg,
+  Img,
   Media,
 } from "./Elements";
 import { Link } from "react-router-dom";
@@ -273,7 +274,7 @@ function Disputes({ history, location, match }) {
               </td>
               <td>{item.issue}</td>
               <td className="user">
-                <img src={item.plaintiff.profileImg || "/profile-user.jpg"} />
+                <Img src={item.plaintiff.profileImg || "/profile-user.jpg"} />
                 <p className="name">
                   {item.plaintiff.firstName + " " + item.plaintiff.lastName}
                   <span className="phone">{item.plaintiff.phone}</span>
@@ -286,7 +287,7 @@ function Disputes({ history, location, match }) {
                 </p>
               </td>
               <td className="user">
-                <img src={item.defendant.profileImg || "/profile-user.jpg"} />
+                <Img src={item.defendant.profileImg || "/profile-user.jpg"} />
                 <p className="name">
                   {item.defendant.firstName + " " + item.defendant.lastName}
                   <span className="phone">{item.defendant.phone}</span>
@@ -443,9 +444,14 @@ export const SingleDispute = ({ history, location, match }) => {
           {msg}
         </Modal>
         <Modal open={showChat} className="disputeChat" ref={chatRef}>
+          <Chat
+            chat={chat}
+            user={data.defendant._id}
+            client={data.plaintiff._id}
+          />
           <div className="chatHead">
             <div className="user">
-              <img src={data.plaintiff.profileImg} />
+              <Img src={data.plaintiff.profileImg} />
               <p className="name">
                 {data.plaintiff.firstName + " " + data.plaintiff.lastName}
                 <span className="role">Plaintiff</span>
@@ -455,18 +461,13 @@ export const SingleDispute = ({ history, location, match }) => {
               <X_svg />
             </button>
             <div className="user def">
-              <img src={data.defendant.profileImg || "/profile-user.jpg"} />
+              <Img src={data.defendant.profileImg || "/profile-user.jpg"} />
               <p className="name">
                 {data.defendant.firstName + " " + data.defendant.lastName}
                 <span className="role">Defendant</span>
               </p>
             </div>
           </div>
-          <Chat
-            chat={chat}
-            user={data.defendant._id}
-            client={data.plaintiff._id}
-          />
         </Modal>
       </div>
     );
@@ -539,38 +540,40 @@ export const SingleDispute = ({ history, location, match }) => {
 const Chat = ({ chat, user, client }) => {
   return (
     <ul className="chats">
-      {chat.map((msg, i) => {
-        if (!msg) {
-          return null;
-        }
-        const timestamp =
-          Math.abs(
-            new Date(msg.createdAt).getTime() -
-              new Date(chat[i + 1]?.createdAt).getTime()
-          ) > 120000;
-        const dateStamp =
-          moment(msg.createdAt).format("YYYY-MM-DD") !==
-            moment(chat[i - 1]?.createdAt).format("YYYY-MM-DD") || i === 0;
-        return (
-          <li
-            key={i}
-            className={`bubble ${msg.from === user ? "user" : "client"}`}
-          >
-            {dateStamp && (
-              <Moment className="dateStamp" format="MMM DD, YYYY">
-                {msg.createdAt}
-              </Moment>
-            )}
-            {msg.text && <p className="text">{msg.text}</p>}
-            {msg.media && <MediaBubble link={msg.media} />}
-            {(timestamp || i === chat.length - 1) && (
-              <Moment className="timestamp" format="hh:mm a">
-                {msg.createdAt}
-              </Moment>
-            )}
-          </li>
-        );
-      })}
+      {chat
+        .map((msg, i) => {
+          if (!msg) {
+            return null;
+          }
+          const timestamp =
+            Math.abs(
+              new Date(msg.createdAt).getTime() -
+                new Date(chat[i + 1]?.createdAt).getTime()
+            ) > 120000;
+          const dateStamp =
+            moment(msg.createdAt).format("YYYY-MM-DD") !==
+              moment(chat[i - 1]?.createdAt).format("YYYY-MM-DD") || i === 0;
+          return (
+            <li
+              key={i}
+              className={`bubble ${msg.from === user ? "user" : "client"}`}
+            >
+              {dateStamp && (
+                <Moment className="dateStamp" format="MMM DD, YYYY">
+                  {msg.createdAt}
+                </Moment>
+              )}
+              {msg.text && <p className="text">{msg.text}</p>}
+              {msg.media && <MediaBubble link={msg.media} />}
+              {(timestamp || i === chat.length - 1) && (
+                <Moment className="timestamp" format="hh:mm a">
+                  {msg.createdAt}
+                </Moment>
+              )}
+            </li>
+          );
+        })
+        .reverse()}
     </ul>
   );
 };
@@ -580,21 +583,21 @@ const MediaBubble = ({ link }) => {
   let fullView = null;
   const [open, setOpen] = useState(false);
   if (link.match(/(\.gif|\.png|\.jpg|\.jpeg|\.webp)$/)) {
-    view = <img src={link} onClick={() => setOpen(true)} />;
+    view = <Img src={link} onClick={() => setOpen(true)} />;
   } else if (link.match(/(\.mp3|\.ogg|\.amr|\.m4a|\.flac|\.wav|\.aac)$/)) {
     view = <audio src={link} controls="on" />;
   } else if (link.match(/(\.mp4|\.mov|\.avi|\.flv|\.wmv|\.webm)$/)) {
     view = (
       <div className={`videoThumb`}>
         <video src={link} onClick={() => setOpen(true)} />
-        <img src="/play_btn.png" />
+        <Img src="/play_btn.png" />
       </div>
     );
     fullView = <video src={link} controls="on" autoPlay="on" />;
   } else {
     view = (
       <a href={link} target="_blank" className="link">
-        <img src="/file_icon.png" />
+        <Img src="/file_icon.png" />
         {link}
       </a>
     );
@@ -704,7 +707,7 @@ const Case = ({ role, dispute, setData }) => {
       </div>
       <div className="content">
         <div className="user">
-          <img src={dispute[role].profileImg || "/profile-user.jpg"} />
+          <Img src={dispute[role].profileImg || "/profile-user.jpg"} />
           <p className="name">
             {dispute[role].firstName + " " + dispute[role].lastName}
             <span className="phone">{dispute[role].phone}</span>
@@ -717,7 +720,7 @@ const Case = ({ role, dispute, setData }) => {
             </li>
             <li>
               <label>Current Balance:</label>{" "}
-              <div>₹ {dispute[role].balance}</div>
+              <div>₹ {dispute[role].balance?.fix()}</div>
             </li>
             <li>
               <label>Case:</label>{" "}

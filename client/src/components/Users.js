@@ -11,6 +11,7 @@ import {
   UploadFiles,
   Plus_svg,
   Actions,
+  Img,
 } from "./Elements";
 import { Link } from "react-router-dom";
 import { Modal, Confirm } from "./Modal";
@@ -21,7 +22,7 @@ import { DateRange } from "react-date-range";
 import moment from "moment";
 require("./styles/transactions.scss");
 
-function Users({ history, location, pathname }) {
+function Users({ history, location, match }) {
   const dateFilterRef = useRef();
   const [msg, setMsg] = useState(null);
   const [total, setTotal] = useState(0);
@@ -141,7 +142,7 @@ function Users({ history, location, pathname }) {
           <input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search User's name, phone, email, id"
+            placeholder="Search User's name, phone, id"
           />
           {search && (
             <button onClick={() => setSearch("")}>
@@ -255,7 +256,7 @@ function Users({ history, location, pathname }) {
                 <Moment format="DD MMM, YYYY. hh:mm a">{user.createdAt}</Moment>
               </td>
               <td className="user">
-                <img src={user?.profileImg || "/profile-user.jpg"} />
+                <Img src={user?.profileImg || "/profile-user.jpg"} />
                 <p className="name">
                   {user
                     ? user?.firstName + " " + user?.lastName
@@ -275,7 +276,7 @@ function Users({ history, location, pathname }) {
                   >
                     Edit
                   </button>
-                  <Link to={`/dashboard/users/user._id`}>
+                  <Link to={`/dashboard/users/${user._id}`}>
                     <li>View</li>
                   </Link>
                   <button
@@ -864,6 +865,44 @@ const UserForm = ({ edit, onSuccess }) => {
       </Modal>
     </>
   );
+};
+
+export const FullUser = ({ match }) => {
+  const [user, setUser] = useState(null);
+  const [msg, setMsg] = useState(null);
+  useEffect(() => {
+    console.log(match.params._id);
+    fetch(`/api/users?q=${match.params._id}`)
+      .then((res) => res.json())
+      .then(({ users }) => {
+        if (users) {
+          setUser(users[0]);
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+        setMsg(
+          <>
+            <button onClick={() => setMsg(null)}>Okay</button>
+            <div>
+              <Err_svg />
+              <h4>Could not get user. Make sure you're online.</h4>
+            </div>
+          </>
+        );
+      });
+  }, []);
+  if (user) {
+    return (
+      <div className="fullUser">
+        <div className="profile">
+          <Img src={user.profileImg} />
+        </div>
+        <UserForm edit={user} />
+      </div>
+    );
+  }
+  return <>Loading</>;
 };
 
 export default Users;

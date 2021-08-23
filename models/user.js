@@ -164,7 +164,7 @@ const OTPModel = new Schema(
   {
     id: { type: String, required: true, unique: true },
     code: { type: String, required: true },
-    expireAt: { type: Date, default: Date.now, index: { expires: "2m" } },
+    expireAt: { type: Date, default: Date.now, index: { expires: "30m" } },
     attempt: { type: Number, default: 0 },
   },
   { timestamp: true }

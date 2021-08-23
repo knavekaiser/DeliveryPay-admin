@@ -47,10 +47,7 @@ app.get(
           res.json({
             code: "ok",
             totalBalance: totalBalance[0].balance,
-            recentTrans: recentTrans.map((item) => ({
-              ...item._doc,
-              user: null,
-            })),
+            recentTrans,
             activeMilestones,
             activeDisputes,
             transactionThisMonth: transactionThisMonth[0].total,

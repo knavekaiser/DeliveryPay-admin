@@ -1,7 +1,7 @@
 global.sendSms = ({ variables_values, to, otp, message }) => {
   const reqBody = {
     route: "dlt",
-    sender_id: otp ? "DelOTP" : "DelPay",
+    sender_id: "DelPay",
     message,
     variables_values,
     flash: 0,

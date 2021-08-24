@@ -1330,11 +1330,20 @@ export const Actions = ({
   const [open, setOpen] = useState(false);
   const [style, setStyle] = useState({});
   const buttonRef = useRef();
+  const wrapperRef = useRef();
   useLayoutEffect(() => {
     const { height, y, width, x } = buttonRef.current?.getBoundingClientRect();
+    const bottom = window.innerHeight - (y + height);
+    const wrapper = wrapperRef.current?.getBoundingClientRect();
     setStyle({
       position: "fixed",
-      top: height + y + 4,
+      ...(wrapper?.height > bottom
+        ? {
+            bottom: window.innerHeight - y,
+          }
+        : {
+            top: height + y + 4,
+          }),
       right: window.innerWidth - x - width,
     });
   }, [open]);
@@ -1360,6 +1369,7 @@ export const Actions = ({
         onBackdropClick={() => setOpen(false)}
       >
         <ul
+          ref={wrapperRef}
           className={wrapperClassName}
           onClick={(e) => {
             e.stopPropagation();

@@ -244,7 +244,6 @@ app.post("/api/sendAdminForgotPassOTP", async (req, res) => {
               text: `Hello,\nYour password reset code is ${code}. \nDelivery Pay.`,
             })
               .then((emailRes) => {
-                console.log(dbRes);
                 res.json({
                   message:
                     "6 digit code has been sent, enter it within 2 minutes",
@@ -260,7 +259,7 @@ app.post("/api/sendAdminForgotPassOTP", async (req, res) => {
             sendSms({
               to: [phone.replace("+91", "")],
               otp: true,
-              message: 127687,
+              message: 128576,
               variables_values: code,
             })
               .then((smsRes) => {

@@ -311,6 +311,21 @@ function Users({ history, location, match }) {
                                     </div>
                                   </>
                                 );
+                              } else if (data.code === 403) {
+                                setMsg(
+                                  <>
+                                    <button onClick={() => setMsg(null)}>
+                                      Okay
+                                    </button>
+                                    <div>
+                                      <Err_svg />
+                                      <h4>
+                                        Can't delete users with balance in their
+                                        account.
+                                      </h4>
+                                    </div>
+                                  </>
+                                );
                               } else {
                                 setMsg(
                                   <>
@@ -481,7 +496,7 @@ const UserForm = ({ edit, onSuccess }) => {
         ...(edit && { _id: edit._id }),
         firstName,
         lastName,
-        phone,
+        phone: "+91" + phone.replace(/^(\+91|91|1|)(?=\d{10}$)/g, ""),
         email,
         ...(password && { password }),
         age,
@@ -585,6 +600,9 @@ const UserForm = ({ edit, onSuccess }) => {
             name="phone"
             value={phone}
             required={true}
+            maxLength={13}
+            minLength={10}
+            pattern="^(\+91|91|1|)\d{10}$"
             onChange={(e) => setPhone(e.target.value)}
           />
         </section>
@@ -747,7 +765,6 @@ const UserForm = ({ edit, onSuccess }) => {
         <section>
           <label>Shipping Cost ₹</label>
           <NumberInput
-            required={true}
             defaultValue={shippingCost}
             name="shippingCost"
             onChange={(e) => setShippingCost(e.target.value)}
@@ -756,7 +773,6 @@ const UserForm = ({ edit, onSuccess }) => {
         <section>
           <label>Delivery Within (days)</label>
           <NumberInput
-            required={true}
             defaultValue={deliveryWithin}
             name="deliveryWithin"
             min={1}
@@ -798,7 +814,6 @@ const UserForm = ({ edit, onSuccess }) => {
             name="name"
             value={name}
             onChange={(e) => setName(e.target.value)}
-            required={true}
           />
         </section>
         <section>
@@ -808,7 +823,6 @@ const UserForm = ({ edit, onSuccess }) => {
             name="bank"
             value={bank}
             onChange={(e) => setBank(e.target.value)}
-            required={true}
           />
         </section>
         <section>
@@ -818,7 +832,6 @@ const UserForm = ({ edit, onSuccess }) => {
             name="city"
             value={city_bank}
             onChange={(e) => setCity_bank(e.target.value)}
-            required={true}
           />
         </section>
         <section>
@@ -828,7 +841,6 @@ const UserForm = ({ edit, onSuccess }) => {
             name="type"
             value={accountType}
             onChange={(e) => setAccountType(e.target.value)}
-            required={true}
           />
         </section>
         <section>
@@ -838,7 +850,6 @@ const UserForm = ({ edit, onSuccess }) => {
             name="accountNumber"
             value={accountNumber}
             onChange={(e) => setAccountNumber(e.target.value)}
-            required={true}
           />
         </section>
         <section>
@@ -848,7 +859,6 @@ const UserForm = ({ edit, onSuccess }) => {
             name="ifsc"
             value={ifsc}
             onChange={(e) => setIfsc(e.target.value)}
-            required={true}
           />
         </section>
         <section className="btns">
@@ -871,7 +881,6 @@ export const FullUser = ({ match }) => {
   const [user, setUser] = useState(null);
   const [msg, setMsg] = useState(null);
   useEffect(() => {
-    console.log(match.params._id);
     fetch(`/api/users?q=${match.params._id}`)
       .then((res) => res.json())
       .then(({ users }) => {

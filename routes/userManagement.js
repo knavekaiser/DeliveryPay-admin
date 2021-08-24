@@ -36,7 +36,6 @@ app.get("/api/users", passport.authenticate("adminPrivate"), (req, res) => {
         },
       }),
   };
-  console.log(query, q, ObjectId.isValid(q));
   User.aggregate([
     { $match: query },
     { $sort: sortOrder },
@@ -93,7 +92,6 @@ app.post("/api/addUser", passport.authenticate("adminPrivate"), (req, res) => {
         }
       });
   } else {
-    console.log("res");
     res.status(400).json({
       code: 400,
       message: "Incomplete request",
@@ -141,15 +139,24 @@ app.delete(
   (req, res) => {
     const { _id } = req.body;
     if (ObjectId.isValid(_id)) {
-      User.findOneAndDelete({ _id }).then((dbRes) => {
-        if (dbRes) {
-          res.json({
-            code: "ok",
-            message: "User has been deleted",
-            user: dbRes,
+      User.findOne({ _id }).then((user) => {
+        if (user.balance > 0) {
+          res.status(403).json({
+            code: 403,
+            message: "Can't delete user with balance in their wallet.",
           });
         } else {
-          res.json({ code: 400, message: "User does not exists" });
+          User.findOneAndDelete({ _id }).then((dbRes) => {
+            if (dbRes) {
+              res.json({
+                code: "ok",
+                message: "User has been deleted",
+                user: dbRes,
+              });
+            } else {
+              res.json({ code: 400, message: "User does not exists" });
+            }
+          });
         }
       });
     } else {

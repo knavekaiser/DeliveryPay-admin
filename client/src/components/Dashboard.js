@@ -19,6 +19,7 @@ import Settings, { SiteSettings } from "./Settings";
 import Notifications from "./notification";
 import Disputes, { SingleDispute } from "./Disputes";
 import Users, { FullUser } from "./Users";
+import BugReport from "./BugReport";
 import {
   Faqs,
   Tickets,
@@ -429,6 +430,20 @@ function Dashboard({ location }) {
             <p className="label">Site Settings</p>
           </Link>
         </li>
+        <li
+          className={`settings ${
+            location.pathname.startsWith("/dashboard/bugReport")
+              ? "active"
+              : undefined
+          }`}
+        >
+          <Link to="/dashboard/bugReport">
+            <div className="icon">
+              <Img src="/setting.png" />
+            </div>
+            <p className="label">Bug Report</p>
+          </Link>
+        </li>
         {
           // <li
           //   className={`${
@@ -561,6 +576,7 @@ function Dashboard({ location }) {
           />
           <Route path="/dashboard/settings" component={Settings} />
           <Route path="/dashboard/siteSettings" component={SiteSettings} />
+          <Route path="/dashboard/bugReport" component={BugReport} />
           <Route
             path="/dashboard/support/contactRequest"
             component={ContactRequest}

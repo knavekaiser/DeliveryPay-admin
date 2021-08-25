@@ -410,60 +410,75 @@ app.delete(
   }
 );
 
-app.get(
-  "/api/viewAllWorkRequest",
-  passport.authenticate("adminPrivate"),
-  (req, res) => {
-    const { q, page, perPage, sort, order, dateFrom, dateTo } = req.query;
-    const sortOrder = {
-      [sort || "createdAt"]: order === "asc" ? 1 : -1,
-    };
-    const query = {
-      ...(q && {
-        $or: [
-          { email: new RegExp(q, "gi") },
-          { phone: new RegExp(q, "gi") },
-          { firstName: new RegExp(q, "gi") },
-        ],
-      }),
-      ...(dateFrom &&
-        dateTo && {
-          createdAt: {
-            $gte: new Date(dateFrom),
-            $lt: new Date(dateTo),
-          },
-        }),
-    };
-    Bug.aggregate([
-      { $match: query },
-      { $sort: sortOrder },
-      {
-        $facet: {
-          requests: [
-            { $skip: +perPage * (+(page || 1) - 1) },
-            { $limit: +(perPage || 20) },
-          ],
-          pageInfo: [{ $group: { _id: null, count: { $sum: 1 } } }],
+app.post("/api/bugReport", (req, res) => {
+  new Bug({
+    user: req.body.user || null,
+    issue: req.body.issue,
+    dscr: req.body.dscr,
+    url: req.headers.referer,
+    files: req.body.files || null,
+  })
+    .save()
+    .then((bug) => {
+      res.json({ code: "ok", message: "bug has been reported" });
+    })
+    .catch((err) => {
+      console.log(err, req.body);
+      res.status(500).json({ code: 500, message: "Database error" });
+    });
+});
+app.get("/api/bugReport", passport.authenticate("adminPrivate"), (req, res) => {
+  const { q, page, perPage, sort, order, dateFrom, dateTo } = req.query;
+  const sortOrder = {
+    [sort || "createdAt"]: order === "asc" ? 1 : -1,
+  };
+  const query = {
+    ...(q && {
+      $or: [
+        { email: new RegExp(q, "gi") },
+        { phone: new RegExp(q, "gi") },
+        { firstName: new RegExp(q, "gi") },
+      ],
+    }),
+    ...(dateFrom &&
+      dateTo && {
+        createdAt: {
+          $gte: new Date(dateFrom),
+          $lt: new Date(dateTo),
         },
+      }),
+  };
+  Bug.aggregate([
+    { $match: query },
+    { $sort: sortOrder },
+    {
+      $facet: {
+        bugs: [
+          { $skip: +perPage * (+(page || 1) - 1) },
+          { $limit: +(perPage || 20) },
+        ],
+        total: [{ $group: { _id: null, count: { $sum: 1 } } }],
       },
-    ])
-      .then((dbRes) => {
-        res.json({ code: "ok", requests: dbRes[0] });
-      })
-      .catch((err) => {
-        console.log(err);
-        res.status(500).json({ message: "something went wrong" });
-      });
-  }
-);
+    },
+    { $set: { total: { $first: "$total.count" } } },
+  ])
+    .then(([{ bugs, total }]) => {
+      res.json({ code: "ok", bugs, total: total || 0 });
+    })
+    .catch((err) => {
+      console.log(err);
+      res.status(500).json({ message: "something went wrong" });
+    });
+});
 app.delete(
-  "/api/deleteWorkRequest",
+  "/api/deleteBugReport",
   passport.authenticate("adminPrivate"),
   (req, res) => {
+    console.log(req.body._id);
     Bug.findByIdAndDelete(req.body._id)
       .then((dbRes) => {
         if (dbRes) {
-          res.json({ message: "bug deleted" });
+          res.json({ code: "ok", message: "bug deleted" });
         } else {
           res.status(400).json({ message: "bad request" });
         }

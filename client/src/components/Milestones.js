@@ -384,6 +384,7 @@ const PayoutModal = ({ onSuccess }) => {
                             key: item,
                           })
                         );
+                        console.log(headers);
                         setCsvReport({
                           headers,
                           data: data.users,

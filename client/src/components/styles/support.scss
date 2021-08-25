@@ -218,3 +218,19 @@
     }
   }
 }
+
+.fullBug {
+  max-width: 50rem;
+  .content {
+    padding: 1.5rem;
+    display: grid;
+    grid-gap: 1.5rem;
+    section {
+      label {
+        font-size: 0.8rem;
+        color: rgba(0, 0, 0, 0.6);
+        display: block;
+      }
+    }
+  }
+}

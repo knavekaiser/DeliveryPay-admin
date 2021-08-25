@@ -273,6 +273,13 @@
       }
     }
   }
+  &.bugContainer {
+    table {
+      tr {
+        grid-template-columns: 11rem 10rem 1fr 0.5fr 5rem 3.5rem;
+      }
+    }
+  }
   table {
     width: 100%;
     tr {
@@ -336,6 +343,7 @@
           align-items: center;
           grid-gap: 0.7rem;
           img {
+            flex-shrink: 0;
             height: 2.5rem;
             width: 2.5rem;
             border-radius: 50%;

@@ -19,12 +19,11 @@ class ErrorBoundary extends React.Component {
       method: "POST",
       headers: { "Content-type": "application/json" },
       body: JSON.stringify({
-        err: error.name,
-        message: error.message,
+        issue: error.toString(),
         dscr: errorInfo,
       }),
     };
-    fetch("/api/bugReportAuto", options)
+    fetch("/api/bugReport", options)
       .then((res) => res.json())
       .then((data) => {
         if (data.code === "ok") {

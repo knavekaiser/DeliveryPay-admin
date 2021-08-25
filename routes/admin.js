@@ -66,7 +66,6 @@ app.post(
   passport.authenticate("admin", { session: false, failWithError: true }),
   handleSignIn,
   (err, req, res, next) => {
-    console.log(err);
     res.status(401).json({ code: 401, message: "invalid credentials" });
   }
 );

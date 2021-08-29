@@ -8,14 +8,14 @@ import {
   X_svg,
   Img,
   Media,
+  Moment,
+  moment,
 } from "./Elements";
 import { Link } from "react-router-dom";
 import { Modal, Confirm } from "./Modal";
-import Moment from "react-moment";
 import "react-date-range/dist/styles.css";
 import "react-date-range/dist/theme/default.css";
 import { DateRange } from "react-date-range";
-import moment from "moment";
 require("./styles/transactions.scss");
 
 function Disputes({ history, location, match }) {
@@ -49,17 +49,27 @@ function Disputes({ history, location, match }) {
     });
   }, []);
   useEffect(() => {
-    const startDate = moment(dateRange.startDate).format("YYYY-MM-DD");
-    const endDate = moment(dateRange.endDate).format("YYYY-MM-DD");
-    const lastDate = moment(
-      new Date(dateRange.endDate).setDate(dateRange.endDate.getDate() + 1)
-    ).format("YYYY-MM-DD");
+    const startDate = moment({
+      time: dateRange?.startDate,
+      format: "YYYY-MM-DD",
+    });
+    const endDate = moment({
+      time: dateRange?.endDate.setHours(24, 0, 0, 0),
+      format: "YYYY-MM-DD",
+    });
     fetch(
-      `/api/disputes?page=${page}&perPage=${perPage}&sort=${
-        sort.column
-      }&order=${sort.order}${search && "&q=" + search}${
-        dateFilter ? "&dateFrom=" + startDate + "&dateTo=" + lastDate : ""
-      }${status && "&status=" + status}`
+      `/api/disputes?${new URLSearchParams({
+        page,
+        perPage,
+        sort: sort.column,
+        order: sort.order,
+        ...(search && { q: search }),
+        ...(dateFilter && {
+          dateFrom: startDate,
+          dateTo: endDate,
+        }),
+        ...(status && { status }),
+      }).toString()}`
     )
       .then((res) => res.json())
       .then((data) => {
@@ -329,6 +339,7 @@ function Disputes({ history, location, match }) {
         open={dateOpen}
         onBackdropClick={() => setDateOpen(false)}
         backdropClass="datePicker"
+        className="datePicker"
         style={datePickerStyle}
       >
         <DateRange
@@ -551,8 +562,12 @@ const Chat = ({ chat, user, client }) => {
                 new Date(chat[i + 1]?.createdAt).getTime()
             ) > 120000;
           const dateStamp =
-            moment(msg.createdAt).format("YYYY-MM-DD") !==
-              moment(chat[i - 1]?.createdAt).format("YYYY-MM-DD") || i === 0;
+            moment({
+              time: msg.createdAt,
+              format: "YYYY-MM-DD",
+            }) !==
+              moment({ time: chat[i - 1]?.createdAt, format: "YYYY-MM-DD" }) ||
+            i === 0;
           return (
             <li
               key={i}

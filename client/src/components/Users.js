@@ -12,14 +12,15 @@ import {
   Plus_svg,
   Actions,
   Img,
+  Moment,
+  moment,
+  Media,
 } from "./Elements";
 import { Link } from "react-router-dom";
 import { Modal, Confirm } from "./Modal";
-import Moment from "react-moment";
 import "react-date-range/dist/styles.css";
 import "react-date-range/dist/theme/default.css";
 import { DateRange } from "react-date-range";
-import moment from "moment";
 require("./styles/transactions.scss");
 
 function Users({ history, location, match }) {
@@ -54,22 +55,32 @@ function Users({ history, location, match }) {
     });
   }, []);
   useEffect(() => {
-    const startDate = moment(dateRange.startDate).format("YYYY-MM-DD");
-    const endDate = moment(dateRange.endDate).format("YYYY-MM-DD");
-    const lastDate = moment(
-      new Date(dateRange.endDate).setDate(dateRange.endDate.getDate() + 1)
-    ).format("YYYY-MM-DD");
+    const startDate = moment({
+      time: dateRange?.startDate,
+      format: "YYYY-MM-DD",
+    });
+    const endDate = moment({
+      time: dateRange?.endDate.setHours(24, 0, 0, 0),
+      format: "YYYY-MM-DD",
+    });
     fetch(
-      `/api/users?page=${page}&perPage=${perPage}&sort=${sort.column}&order=${
-        sort.order
-      }${search && "&q=" + search}${
-        dateFilter ? "&dateFrom=" + startDate + "&dateTo=" + lastDate : ""
-      }`
+      `/api/users?${new URLSearchParams({
+        page,
+        perPage,
+        sort: sort.column,
+        sort: sort.order,
+        ...(search && { q: search }),
+        ...(dateFilter && {
+          dateFrom: startDate,
+          dateTo: endDate,
+        }),
+      }).toString()}`
     )
       .then((res) => res.json())
       .then((data) => {
         if (data.code === "ok") {
           setUsers(data.users);
+          console.log(data.users);
           setTotal(data.total);
         } else {
           setMsg(
@@ -232,7 +243,12 @@ function Users({ history, location, match }) {
             >
               User <Chev_down_svg />
             </th>
-            <th>User ID</th>
+            <th>Total Spent</th>
+            <th>Total Sold</th>
+            <th>Total Login</th>
+            <th>Last Login</th>
+            <th>Total Milestone</th>
+            <th>Dispute filed</th>
             <th
               className={
                 sort.column === "amount" ? "sort" + " " + sort.order : ""
@@ -258,14 +274,21 @@ function Users({ history, location, match }) {
               <td className="user">
                 <Img src={user?.profileImg || "/profile-user.jpg"} />
                 <p className="name">
-                  {user
-                    ? user?.firstName + " " + user?.lastName
-                    : "Deleted user"}
+                  {user ? user.firstName + " " + user.lastName : "Deleted user"}
                   <span className="phone">{user?.phone}</span>
                 </p>
               </td>
-              <td>{user.userId}</td>
-              <td>{(user.balance || 0).fix()}</td>
+              <td>₹{user.orders?.bought?.total_rupee || 0}</td>
+              <td>₹{user.orders?.sold?.total_rupee || 0}</td>
+              <td>{user.logins}</td>
+              <td>
+                <Moment format="D/MM/YY hh:mma">
+                  {user.lastLogin?.createdAt}
+                </Moment>
+              </td>
+              <td>₹{user.milestones_total}</td>
+              <td>{user.disputesStart}</td>
+              <td>₹{(user.balance || 0).fix()}</td>
               <td className="action">
                 <Actions>
                   <button
@@ -394,6 +417,7 @@ function Users({ history, location, match }) {
         open={dateOpen}
         onBackdropClick={() => setDateOpen(false)}
         backdropClass="datePicker"
+        className="datePicker"
         style={datePickerStyle}
       >
         <DateRange
@@ -904,10 +928,137 @@ export const FullUser = ({ match }) => {
   if (user) {
     return (
       <div className="fullUser">
+        <section className="head">
+          <h3>User Information</h3>
+          <hr />
+        </section>
         <div className="profile">
           <Img src={user.profileImg} />
         </div>
-        <UserForm edit={user} />
+        <section>
+          <label>Full Name</label>
+          <p className="data">
+            {user.firstName} {user.lastName}
+          </p>
+        </section>
+        <section>
+          <label>Phone</label>
+          <p className="data">{user.phone}</p>
+        </section>
+        <section>
+          <label>Email</label>
+          <p className="data">{user.email}</p>
+        </section>
+        <section>
+          <label>Gender</label>
+          <p className="data">{user.gender}</p>
+        </section>
+        <section>
+          <label>Email</label>
+          <p className="data">{user.age}</p>
+        </section>
+        <section className="head">
+          <h3>Address</h3>
+          <hr />
+        </section>
+        <section>
+          <label>Street</label>
+          <p className="data">{user.address?.street}</p>
+        </section>
+        <section>
+          <label>City</label>
+          <p className="data">{user.address?.city}</p>
+        </section>
+        <section>
+          <label>State</label>
+          <p className="data">{user.address?.state}</p>
+        </section>
+        <section>
+          <label>Country</label>
+          <p className="data">{user.address?.country}</p>
+        </section>
+        <section>
+          <label>Pin</label>
+          <p className="data">{user.address?.zip}</p>
+        </section>
+        <section className="head">
+          <h3>KYC</h3>
+          <hr />
+        </section>
+        <section>
+          <label>Status</label>
+          <p className="data">
+            {user.kyc?.verified ? "Verified" : "Unverified"}
+          </p>
+        </section>
+        <section>
+          <label>Files</label>
+          <div className="thumbs">
+            <Media links={user.kyc?.files} />
+          </div>
+        </section>
+        <section className="head">
+          <h3>GST</h3>
+          <hr />
+        </section>
+        <section>
+          <label>Registration Number</label>
+          <p className="data">{user.gst?.reg}</p>
+        </section>
+        <section>
+          <label>Files</label>
+          <div className="thumbs">
+            <Media links={user.gst?.detail?.files} />
+          </div>
+        </section>
+        <section>
+          <label>Status</label>
+          <p>{user.gst?.verified ? "Verified" : "Unverified"}</p>
+        </section>
+        <section className="head">
+          <h3>Shop Info</h3>
+          <hr />
+        </section>
+        <section>
+          <label>Shipping Cost</label>
+          <p>{user.shopInfo?.shippingCost}</p>
+        </section>
+        <section>
+          <label>Delivery Within (Days)</label>
+          <p>{user.shopInfo?.deliveryWithin}</p>
+        </section>
+        <section>
+          <label>Refundable</label>
+          <p>{user.shopInfo?.refundable || "No"}</p>
+        </section>
+        <section className="head">
+          <h3>Shop Payment Method</h3>
+          <hr />
+        </section>
+        <section>
+          <label>Full Name</label>
+          <p>{user.shopInfo?.paymentMethod?.name}</p>
+        </section>
+        <section>
+          <label>Bank</label>
+          <p>{user.shopInfo?.paymentMethod?.bank}</p>
+        </section>
+        <section>
+          <label>City</label>
+          <p>{user.shopInfo?.paymentMethod?.city}</p>
+        </section>
+        <section>
+          <label>Account Type</label>
+          <p>{user.shopInfo?.paymentMethod?.accountType}</p>
+        </section>
+        <section>
+          <label>Account Number</label>
+          <p>{user.shopInfo?.paymentMethod?.accountNumber}</p>
+        </section>
+        <section>
+          <label>IFSC</label>
+          <p>{user.shopInfo?.paymentMethod?.ifsc}</p>
+        </section>
       </div>
     );
   }

@@ -11,11 +11,10 @@ import {
   UploadFiles,
   Media,
   Actions,
+  Moment,
 } from "./Elements";
 import { Modal, Confirm } from "./Modal";
-import Moment from "react-moment";
 import TextareaAutosize from "react-textarea-autosize";
-import moment from "moment";
 
 function Notifications({ history, location, pathname }) {
   const [msg, setMsg] = useState(null);

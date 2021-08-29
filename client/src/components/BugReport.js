@@ -10,12 +10,12 @@ import {
   Img,
   Succ_svg,
   Actions,
+  moment,
+  Moment,
 } from "./Elements";
 import { Modal, Confirm } from "./Modal";
-import Moment from "react-moment";
 import "react-date-range/dist/styles.css";
 import "react-date-range/dist/theme/default.css";
-import moment from "moment";
 import { CSVLink } from "react-csv";
 require("./styles/transactions.scss");
 
@@ -33,11 +33,14 @@ function BugReport({ history, location, pathname }) {
   const [payout, setPayout] = useState(false);
   const [fullView, setFullView] = useState(null);
   useEffect(() => {
-    const startDate = moment(dateRange?.startDate).format("YYYY-MM-DD");
-    const endDate = moment(dateRange?.endDate).format("YYYY-MM-DD");
-    const lastDate = moment(
-      new Date(dateRange?.endDate).setDate(dateRange?.endDate.getDate() + 1)
-    ).format("YYYY-MM-DD");
+    const startDate = moment({
+      time: dateRange?.startDate,
+      format: "YYYY-MM-DD",
+    });
+    const endDate = moment({
+      time: dateRange?.endDate.setHours(24, 0, 0, 0),
+      format: "YYYY-MM-DD",
+    });
     fetch(
       `/api/bugReport?${new URLSearchParams({
         page,
@@ -47,7 +50,7 @@ function BugReport({ history, location, pathname }) {
         ...(search && { q: search }),
         ...(dateRange && {
           dateFrom: startDate,
-          dateTo: lastDate,
+          dateTo: endDate,
         }),
         ...(status && { status }),
       }).toString()}`

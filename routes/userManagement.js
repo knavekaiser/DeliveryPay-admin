@@ -38,6 +38,142 @@ app.get("/api/users", passport.authenticate("adminPrivate"), (req, res) => {
   };
   User.aggregate([
     { $match: query },
+    {
+      $lookup: {
+        from: "logins",
+        let: { user: "$_id" },
+        as: "logins",
+        pipeline: [{ $match: { $expr: { $eq: ["$user", "$$user"] } } }],
+      },
+    },
+    {
+      $set: { logins: { $size: "$logins" }, lastLogin: { $last: "$logins" } },
+    },
+    {
+      $lookup: {
+        from: "disputes",
+        let: { user: "$_id" },
+        as: "disputesStart",
+        pipeline: [
+          {
+            $match: {
+              $expr: {
+                $or: [
+                  {
+                    $eq: ["$$user", "$plaintiff._id"],
+                  },
+                ],
+              },
+            },
+          },
+        ],
+      },
+    },
+    { $set: { disputesStart: { $size: "$disputesStart" } } },
+    {
+      $lookup: {
+        from: "milestones",
+        let: { user: "$_id" },
+        as: "milestones",
+        pipeline: [
+          {
+            $match: {
+              $expr: {
+                $eq: ["$buyer._id", "$$user"],
+              },
+            },
+          },
+          {
+            $group: {
+              _id: "$status",
+              total: { $sum: "$amount" },
+            },
+          },
+        ],
+      },
+    },
+    { $set: { milestones_total: { $sum: "$milestones.total" } } },
+    {
+      $lookup: {
+        from: "orders",
+        as: "orders",
+        let: { user: "$_id" },
+        pipeline: [
+          {
+            $match: {
+              $expr: {
+                $or: [
+                  { $eq: ["$$user", "$seller._id"] },
+                  { $eq: ["$$user", "$buyer._id"] },
+                ],
+              },
+            },
+          },
+          {
+            $group: {
+              _id: "$seller._id",
+              total_rupee: { $sum: "$total" },
+              total_qty: { $sum: { $sum: "$products.qty" } },
+            },
+          },
+          {
+            $set: {
+              role: {
+                $cond: {
+                  if: {
+                    $eq: ["$$user", "$_id"],
+                  },
+                  then: "sold",
+                  else: "baught",
+                },
+              },
+            },
+          },
+          { $facet: { orders: [] } },
+          {
+            $set: {
+              bought: {
+                $reduce: {
+                  input: "$orders",
+                  initialValue: {},
+                  in: {
+                    $cond: {
+                      if: { $eq: ["$$this.role", "sold"] },
+                      then: "$$this",
+                      else: null,
+                    },
+                  },
+                },
+              },
+              sold: {
+                $reduce: {
+                  input: "$orders",
+                  initialValue: {},
+                  in: {
+                    $cond: {
+                      if: { $eq: ["$$this.role", "sold"] },
+                      then: "$$this",
+                      else: null,
+                    },
+                  },
+                },
+              },
+            },
+          },
+          {
+            $project: {
+              orders: 0,
+              "bought._id": 0,
+              "sold._id": 0,
+            },
+          },
+        ],
+      },
+    },
+    { $set: { orders: { $first: "$orders" } } },
+    {
+      $project: { notifications: 0 },
+    },
     { $sort: sortOrder },
     {
       $facet: {

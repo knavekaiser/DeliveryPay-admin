@@ -6,13 +6,13 @@ import {
   Chev_down_svg,
   X_svg,
   Img,
+  Moment,
+  moment,
 } from "./Elements";
 import { Modal } from "./Modal";
-import Moment from "react-moment";
 import "react-date-range/dist/styles.css";
 import "react-date-range/dist/theme/default.css";
 import { DateRange } from "react-date-range";
-import moment from "moment";
 require("./styles/transactions.scss");
 
 function Transactions({ history, location, pathname }) {
@@ -45,17 +45,26 @@ function Transactions({ history, location, pathname }) {
     });
   }, []);
   useEffect(() => {
-    const startDate = moment(dateRange.startDate).format("YYYY-MM-DD");
-    const endDate = moment(dateRange.endDate).format("YYYY-MM-DD");
-    const lastDate = moment(
-      new Date(dateRange.endDate).setDate(dateRange.endDate.getDate() + 1)
-    ).format("YYYY-MM-DD");
+    const startDate = moment({
+      time: dateRange?.startDate,
+      format: "YYYY-MM-DD",
+    });
+    const endDate = moment({
+      time: dateRange?.endDate.setHours(24, 0, 0, 0),
+      format: "YYYY-MM-DD",
+    });
     fetch(
-      `/api/transactions?page=${page}&perPage=${perPage}&sort=${
-        sort.column
-      }&order=${sort.order}${search && "&q=" + search}${
-        dateFilter ? "&dateFrom=" + startDate + "&dateTo=" + lastDate : ""
-      }`
+      `/api/transactions?${new URLSearchParams({
+        page,
+        perPage,
+        sort: sort.column,
+        sort: sort.order,
+        ...(search && { q: search }),
+        ...(dateFilter && {
+          dateFrom: startDate,
+          dateTo: endDate,
+        }),
+      }).toString()}`
     )
       .then((res) => res.json())
       .then((data) => {
@@ -288,6 +297,7 @@ function Transactions({ history, location, pathname }) {
         open={dateOpen}
         onBackdropClick={() => setDateOpen(false)}
         backdropClass="datePicker"
+        className="datePicker"
         style={datePickerStyle}
       >
         <DateRange

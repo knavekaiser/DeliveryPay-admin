@@ -11,6 +11,7 @@ import {
   Plus_svg,
   Minus_svg,
   Img,
+  Moment,
 } from "./Elements";
 import { GoogleLogout } from "react-google-login";
 import Transactions from "./Transactions";
@@ -27,7 +28,6 @@ import {
   ContactRequest,
   WorkRequest,
 } from "./Support";
-import Moment from "react-moment";
 
 require("./styles/dashboard.scss");
 

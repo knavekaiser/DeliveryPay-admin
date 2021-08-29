@@ -1,6 +1,5 @@
 import { useRef, useState, useEffect, useLayoutEffect } from "react";
 import { Modal, Confirm } from "./Modal";
-import Moment from "react-moment";
 import { Link } from "react-router-dom";
 import {
   Combobox,
@@ -15,8 +14,9 @@ import {
   UploadFiles,
   FileInput,
   Img,
+  Moment,
+  moment,
 } from "./Elements";
-import moment from "moment";
 import { DateRange } from "react-date-range";
 import TextareaAutosize from "react-textarea-autosize";
 require("./styles/support.scss");
@@ -53,17 +53,26 @@ export const Faqs = ({ history, location, pathname }) => {
     });
   }, []);
   useEffect(() => {
-    const startDate = moment(dateRange.startDate).format("YYYY-MM-DD");
-    const endDate = moment(dateRange.endDate).format("YYYY-MM-DD");
-    const lastDate = moment(
-      new Date(dateRange.endDate).setDate(dateRange.endDate.getDate() + 1)
-    ).format("YYYY-MM-DD");
+    const startDate = moment({
+      time: dateRange?.startDate,
+      format: "YYYY-MM-DD",
+    });
+    const endDate = moment({
+      time: dateRange?.endDate.setHours(24, 0, 0, 0),
+      format: "YYYY-MM-DD",
+    });
     fetch(
-      `/api/faqs?page=${page}&perPage=${perPage}&sort=${sort.column}&order=${
-        sort.order
-      }${search && "&q=" + search}${
-        dateFilter ? "&dateFrom=" + startDate + "&dateTo=" + lastDate : ""
-      }`
+      `/api/faqs?${new URLSearchParams({
+        page,
+        perPage,
+        sort: sort.column,
+        sort: sort.order,
+        ...(search && { q: search }),
+        ...(dateFilter && {
+          dateFrom: startDate,
+          dateTo: endDate,
+        }),
+      }).toString()}`
     )
       .then((res) => res.json())
       .then((data) => {
@@ -279,6 +288,7 @@ export const Faqs = ({ history, location, pathname }) => {
         open={dateOpen}
         onBackdropClick={() => setDateOpen(false)}
         backdropClass="datePicker"
+        className="datePicker"
         style={datePickerStyle}
       >
         <DateRange
@@ -580,17 +590,26 @@ export const Tickets = ({ history, location, pathname }) => {
     });
   }, []);
   useEffect(() => {
-    const startDate = moment(dateRange.startDate).format("YYYY-MM-DD");
-    const endDate = moment(dateRange.endDate).format("YYYY-MM-DD");
-    const lastDate = moment(
-      new Date(dateRange.endDate).setDate(dateRange.endDate.getDate() + 1)
-    ).format("YYYY-MM-DD");
+    const startDate = moment({
+      time: dateRange?.startDate,
+      format: "YYYY-MM-DD",
+    });
+    const endDate = moment({
+      time: dateRange?.endDate.setHours(24, 0, 0, 0),
+      format: "YYYY-MM-DD",
+    });
     fetch(
-      `/api/tickets?page=${page}&perPage=${perPage}&sort=${sort.column}&order=${
-        sort.order
-      }${search && "&q=" + search}${
-        dateFilter ? "&dateFrom=" + startDate + "&dateTo=" + lastDate : ""
-      }`
+      `/api/tickets?${new URLSearchParams({
+        page,
+        perPage,
+        sort: sort.column,
+        sort: sort.order,
+        ...(search && { q: search }),
+        ...(dateFilter && {
+          dateFrom: startDate,
+          dateTo: endDate,
+        }),
+      }).toString()}`
     )
       .then((res) => res.json())
       .then((data) => {
@@ -824,6 +843,7 @@ export const Tickets = ({ history, location, pathname }) => {
         open={dateOpen}
         onBackdropClick={() => setDateOpen(false)}
         backdropClass="datePicker"
+        className="datePicker"
         style={datePickerStyle}
       >
         <DateRange
@@ -1263,17 +1283,26 @@ export const ContactRequest = ({ history, location, pathname }) => {
     });
   }, []);
   useEffect(() => {
-    const startDate = moment(dateRange.startDate).format("YYYY-MM-DD");
-    const endDate = moment(dateRange.endDate).format("YYYY-MM-DD");
-    const lastDate = moment(
-      new Date(dateRange.endDate).setDate(dateRange.endDate.getDate() + 1)
-    ).format("YYYY-MM-DD");
+    const startDate = moment({
+      time: dateRange?.startDate,
+      format: "YYYY-MM-DD",
+    });
+    const endDate = moment({
+      time: dateRange?.endDate.setHours(24, 0, 0, 0),
+      format: "YYYY-MM-DD",
+    });
     fetch(
-      `/api/contactRequest?page=${page}&perPage=${perPage}&sort=${
-        sort.column
-      }&order=${sort.order}${search && "&q=" + search}${
-        dateFilter ? "&dateFrom=" + startDate + "&dateTo=" + lastDate : ""
-      }`
+      `/api/contactRequest?${new URLSearchParams({
+        page,
+        perPage,
+        sort: sort.column,
+        sort: sort.order,
+        ...(search && { q: search }),
+        ...(dateFilter && {
+          dateFrom: startDate,
+          dateTo: endDate,
+        }),
+      }).toString()}`
     )
       .then((res) => res.json())
       .then((data) => {
@@ -1477,6 +1506,7 @@ export const ContactRequest = ({ history, location, pathname }) => {
         open={dateOpen}
         onBackdropClick={() => setDateOpen(false)}
         backdropClass="datePicker"
+        className="datePicker"
         style={datePickerStyle}
       >
         <DateRange
@@ -1595,17 +1625,26 @@ export const WorkRequest = ({ history, location, pathname }) => {
     });
   }, []);
   useEffect(() => {
-    const startDate = moment(dateRange.startDate).format("YYYY-MM-DD");
-    const endDate = moment(dateRange.endDate).format("YYYY-MM-DD");
-    const lastDate = moment(
-      new Date(dateRange.endDate).setDate(dateRange.endDate.getDate() + 1)
-    ).format("YYYY-MM-DD");
+    const startDate = moment({
+      time: dateRange?.startDate,
+      format: "YYYY-MM-DD",
+    });
+    const endDate = moment({
+      time: dateRange?.endDate.setHours(24, 0, 0, 0),
+      format: "YYYY-MM-DD",
+    });
     fetch(
-      `/api/viewAllWorkRequest?page=${page}&perPage=${perPage}&sort=${
-        sort.column
-      }&order=${sort.order}${search && "&q=" + search}${
-        dateFilter ? "&dateFrom=" + startDate + "&dateTo=" + lastDate : ""
-      }`
+      `/api/viewAllWorkRequest?${new URLSearchParams({
+        page,
+        perPage,
+        sort: sort.column,
+        order: sort.order,
+        ...(search && { q: search }),
+        ...(dateFilter && {
+          dateFrom: startDate,
+          dateTo: endDate,
+        }),
+      }).toString()}`
     )
       .then((res) => res.json())
       .then((data) => {
@@ -1815,6 +1854,7 @@ export const WorkRequest = ({ history, location, pathname }) => {
         open={dateOpen}
         onBackdropClick={() => setDateOpen(false)}
         backdropClass="datePicker"
+        className="datePicker"
         style={datePickerStyle}
       >
         <DateRange

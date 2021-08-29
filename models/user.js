@@ -183,3 +183,12 @@ const notificationModel = new Schema(
   { timestamps: true }
 );
 global.Notification = mongoose.model("Notification", notificationModel);
+
+const loginModel = new Schema(
+  {
+    user: { type: Schema.Types.ObjectId, ref: "User" },
+    ip: { type: String },
+  },
+  { timestamps: true }
+);
+global.Login = mongoose.model("Login", loginModel);

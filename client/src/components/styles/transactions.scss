@@ -262,7 +262,16 @@
   &.users {
     table {
       tr {
-        grid-template-columns: 11rem 15rem 1fr 5rem 3.5rem;
+        grid-template-columns: 11rem 1fr 5rem 5rem 5rem 10rem 7rem 6rem 5rem 3.5rem;
+      }
+      tbody {
+        tr {
+          td {
+            &:not(:nth-child(1), :nth-child(2)) {
+              text-align: center;
+            }
+          }
+        }
       }
     }
   }

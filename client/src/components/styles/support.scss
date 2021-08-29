@@ -234,3 +234,26 @@
     }
   }
 }
+
+.fullUser {
+  display: grid;
+  grid-gap: 1.5rem;
+  .head {
+    display: flex;
+    align-items: center;
+    grid-gap: 0.5rem;
+    h3 {
+      font-weight: 300;
+      font-size: 1.5rem;
+    }
+    hr {
+      flex: 1;
+    }
+  }
+  section {
+    label {
+      font-size: 0.8rem;
+      color: rgba(0, 0, 0, 0.6);
+    }
+  }
+}

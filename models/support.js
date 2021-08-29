@@ -69,7 +69,8 @@ global.Faq = mongoose.model("Faq", faqModel);
 
 const configModel = new Schema(
   {
-    fee: { type: Number, required: true },
+    fee: { type: Number },
+    gst: { type: Number },
   },
   { timestamps: true }
 );

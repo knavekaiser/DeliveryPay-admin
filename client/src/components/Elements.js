@@ -10,7 +10,6 @@ import tick from "../tick.svg";
 import tick_border from "../tick_border.svg";
 import { Modal } from "./Modal";
 import { Link, useHistory } from "react-router-dom";
-import Moment from "react-moment";
 import { DateRange } from "react-date-range";
 require("./styles/elements.scss");
 
@@ -1207,6 +1206,53 @@ export const Footer = () => {
   );
 };
 
+export const moment = ({ time, format }) => {
+  if (new Date(time).toString() === "Invalid Date") {
+    return time;
+  }
+  const options = {
+    year: format.includes("YYYY") ? "numeric" : "2-digit",
+    month: format.includes("MMMM")
+      ? "long"
+      : format.includes("MMM")
+      ? "short"
+      : format.includes("MM")
+      ? "2-digit"
+      : "numeric"
+      ? "long"
+      : format.includes("ddd")
+      ? "short"
+      : "narrow",
+    weekday: format.includes("dddd")
+      ? "long"
+      : format.includes("ddd")
+      ? "short"
+      : "narrow",
+    day: format.includes("DD") ? "2-digit" : "numeric",
+    hour: format.includes("hh") ? "2-digit" : "numeric",
+    minute: format.includes("mm") ? "2-digit" : "numeric",
+    second: format.includes("ss") ? "2-digit" : "numeric",
+  };
+  const values = {};
+  new Intl.DateTimeFormat("en-IN", options)
+    .formatToParts(new Date(time || new Date()))
+    .map(({ type, value }) => {
+      values[type] = value;
+    });
+  return format
+    .replace(/Y+/g, values.year)
+    .replace(/M+/g, values.month)
+    .replace(/D+/g, values.day)
+    .replace(/h+/g, values.hour)
+    .replace(/m+/g, values.minute)
+    .replace(/s+/g, values.second)
+    .replace(/a+/g, values.dayPeriod)
+    .replace(/d+/g, values.weekday);
+};
+export const Moment = ({ format, children, ...rest }) => {
+  return <time {...rest}>{moment({ time: children, format })}</time>;
+};
+
 export const UploadFiles = ({ files, setMsg }) => {
   const cdn = process.env.REACT_APP_CDN_HOST;
   const formData = new FormData();
@@ -1255,52 +1301,53 @@ export const Media = ({ links }) => {
   const [mediaPreview, setMediaPreview] = useState(false);
   const [media, setMedia] = useState(null);
   const [index, setIndex] = useState(0);
-  const medias = links.map((item, i) => {
-    let thumb = null;
-    let view = null;
-    const handleClick = (e) => {
-      setMediaPreview(true);
-      setMedia(view);
-      setIndex(i);
-    };
-    if (item.match(/(\.gif|\.png|\.jpg|\.jpeg|\.webp)$/)) {
-      thumb = (
-        <Img
-          className={index === i ? "active" : ""}
-          key={i}
-          src={item}
-          onClick={handleClick}
-        />
-      );
-      view = <Img key={i} src={item} />;
-    } else if (item.match(/(\.mp3|\.ogg|\.amr|\.m4a|\.flac|\.wav|\.aac)$/)) {
-      thumb = (
-        <div
-          key={i}
-          className={`audioThumb ${index === i ? "active" : ""}`}
-          onClick={handleClick}
-        >
-          <Img src="/play_btn.png" />
-        </div>
-      );
-      view = <audio key={i} src={item} controls="on" autoPlay="on" />;
-    } else if (item.match(/(\.mp4|\.mov|\.avi|\.flv|\.wmv|\.webm)$/)) {
-      thumb = (
-        <div key={i} className={`videoThumb ${index === i ? "active" : ""}`}>
-          <video src={item} onClick={handleClick} />
-          <Img src="/play_btn.png" />
-        </div>
-      );
-      view = <video key={i} src={item} controls="on" autoPlay="on" />;
-    } else {
-      thumb = (
-        <a key={i} href={i}>
-          {item}
-        </a>
-      );
-    }
-    return thumb;
-  });
+  const medias =
+    links?.map((item, i) => {
+      let thumb = null;
+      let view = null;
+      const handleClick = (e) => {
+        setMediaPreview(true);
+        setMedia(view);
+        setIndex(i);
+      };
+      if (item.match(/(\.gif|\.png|\.jpg|\.jpeg|\.webp)$/)) {
+        thumb = (
+          <Img
+            className={index === i ? "active" : ""}
+            key={i}
+            src={item}
+            onClick={handleClick}
+          />
+        );
+        view = <Img key={i} src={item} />;
+      } else if (item.match(/(\.mp3|\.ogg|\.amr|\.m4a|\.flac|\.wav|\.aac)$/)) {
+        thumb = (
+          <div
+            key={i}
+            className={`audioThumb ${index === i ? "active" : ""}`}
+            onClick={handleClick}
+          >
+            <Img src="/play_btn.png" />
+          </div>
+        );
+        view = <audio key={i} src={item} controls="on" autoPlay="on" />;
+      } else if (item.match(/(\.mp4|\.mov|\.avi|\.flv|\.wmv|\.webm)$/)) {
+        thumb = (
+          <div key={i} className={`videoThumb ${index === i ? "active" : ""}`}>
+            <video src={item} onClick={handleClick} />
+            <Img src="/play_btn.png" />
+          </div>
+        );
+        view = <video key={i} src={item} controls="on" autoPlay="on" />;
+      } else {
+        thumb = (
+          <a key={i} href={i}>
+            {item}
+          </a>
+        );
+      }
+      return thumb;
+    }) || [];
   return (
     <>
       {medias}

@@ -397,6 +397,24 @@ export const SiteSettings = ({ history, match, location }) => {
             }
             value={(config.fee || 0) + "%"}
           />
+          <SiteDataEdit
+            label="Delivery Pay GST"
+            fields={
+              <>
+                <section>
+                  <input
+                    type="number"
+                    step="0.10"
+                    placeholder="Delivery Pay fee"
+                    defaultValue={config.gst}
+                    name="gst"
+                    required={true}
+                  />
+                </section>
+              </>
+            }
+            value={(config.gst || 0) + "%"}
+          />
         </ul>
       </div>
       <Modal className="msg" open={msg}>

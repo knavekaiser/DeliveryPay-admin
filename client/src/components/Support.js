@@ -66,7 +66,7 @@ export const Faqs = ({ history, location, pathname }) => {
         page,
         perPage,
         sort: sort.column,
-        sort: sort.order,
+        order: sort.order,
         ...(search && { q: search }),
         ...(dateFilter && {
           dateFrom: startDate,
@@ -222,16 +222,16 @@ export const Faqs = ({ history, location, pathname }) => {
             </th>
             <th
               className={
-                sort.column === "author" ? "sort" + " " + sort.order : ""
+                sort.column === "audience" ? "sort" + " " + sort.order : ""
               }
               onClick={() => {
                 setSort((prev) => ({
-                  column: "author",
+                  column: "audience",
                   order: prev.order === "dsc" ? "asc" : "dsc",
                 }));
               }}
             >
-              Author <Chev_down_svg />
+              Audience <Chev_down_svg />
             </th>
             <th
               className={
@@ -334,13 +334,19 @@ const FaqForm = ({ edit, onSuccess, onCancel }) => {
   const [msg, setMsg] = useState(null);
   const [ques, setQues] = useState(edit?.ques || "");
   const [ans, setAns] = useState(edit?.ans || "");
+  const [audience, setAudience] = useState(edit?.audience || "");
   const submit = (e) => {
     e.preventDefault();
     setLoading(true);
     fetch("/api/faq", {
       method: edit ? "PATCH" : "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ ques, ans, ...(edit && { _id: edit._id }) }),
+      body: JSON.stringify({
+        ques,
+        ans,
+        audience,
+        ...(edit && { _id: edit._id }),
+      }),
     })
       .then((res) => res.json())
       .then((data) => {
@@ -376,6 +382,17 @@ const FaqForm = ({ edit, onSuccess, onCancel }) => {
   return (
     <>
       <form onSubmit={submit}>
+        <section>
+          <label htmlFor="name">Audience (Who is this FAQ for)</label>
+          <Combobox
+            defaultValue={audience}
+            options={[
+              { label: "Seller", value: "seller" },
+              { label: "Buyer", value: "buyer" },
+            ]}
+            onChange={(e) => setAudience(e.value)}
+          />
+        </section>
         <section>
           <label htmlFor="name">Question</label>
           <TextareaAutosize
@@ -469,13 +486,7 @@ const SingleFaq = ({ faq, setFaqs }) => {
         <td>
           <Moment format="DD MMM, YYYY. hh:mm a">{faq.createdAt}</Moment>
         </td>
-        <td className="user">
-          <Img src={faq.author?.profileImg || "/profile-user.jpg"} />
-          <p className="name">
-            {faq.author?.name}
-            <span className="phone">{faq.author?.phone}</span>
-          </p>
-        </td>
+        <td>{faq.audience || "--"}</td>
         <td>{faq.ques}</td>
         <td>{faq.ans}</td>
       </tr>
@@ -488,14 +499,17 @@ const SingleFaq = ({ faq, setFaqs }) => {
       >
         <div className="content">
           <h3>{faq.ques}</h3>
+          <p>Audience: {faq.audience || "--"}</p>
           <p>{faq.ans}</p>
-          <div className="author">
-            <Img src={faq.author?.profileImg || "/profile-user.jpg"} />
-            <p className="name">
-              {faq.author?.name || "Deleted user"}
-              <span className="phone">{faq.author?.phone}</span>
-            </p>
-          </div>
+          {
+            //   <div className="author">
+            //   <Img src={faq.author?.profileImg || "/profile-user.jpg"} />
+            //   <p className="name">
+            //     {faq.author?.name || "Deleted user"}
+            //     <span className="phone">{faq.author?.phone}</span>
+            //   </p>
+            // </div>
+          }
           <div className="actions">
             <button
               className="edit"
@@ -603,7 +617,7 @@ export const Tickets = ({ history, location, pathname }) => {
         page,
         perPage,
         sort: sort.column,
-        sort: sort.order,
+        order: sort.order,
         ...(search && { q: search }),
         ...(dateFilter && {
           dateFrom: startDate,
@@ -1296,7 +1310,7 @@ export const ContactRequest = ({ history, location, pathname }) => {
         page,
         perPage,
         sort: sort.column,
-        sort: sort.order,
+        order: sort.order,
         ...(search && { q: search }),
         ...(dateFilter && {
           dateFrom: startDate,

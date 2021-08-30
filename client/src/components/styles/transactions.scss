@@ -187,7 +187,8 @@
   &.faqContainer,
   &.milestoneContainer,
   &.users,
-  &.notiContainer {
+  &.notiContainer,
+  &.couponContainer {
     .filters {
       .add {
         button {
@@ -279,6 +280,13 @@
     table {
       tr {
         grid-template-columns: 12rem 5rem 1fr 1fr 4rem 3.8rem;
+      }
+    }
+  }
+  &.couponContainer {
+    table {
+      tr {
+        grid-template-columns: 7rem 5rem 1fr 1fr 4rem 5rem 5rem 5rem 5rem 5rem 12rem 3.8rem;
       }
     }
   }

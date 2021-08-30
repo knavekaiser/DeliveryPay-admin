@@ -68,7 +68,7 @@ function Users({ history, location, match }) {
         page,
         perPage,
         sort: sort.column,
-        sort: sort.order,
+        order: sort.order,
         ...(search && { q: search }),
         ...(dateFilter && {
           dateFrom: startDate,

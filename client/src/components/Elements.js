@@ -749,7 +749,7 @@ export const Combobox = ({
       left: x,
       top: y + height,
       width: width,
-      height: 37 * options.length,
+      height: 41 * options.length,
       maxHeight: window.innerHeight - (y + height) - 16,
     });
   }, [open]);
@@ -833,13 +833,20 @@ export const Combobox = ({
     </section>
   );
 };
-export const NumberInput = ({ defaultValue, min, max, required, onChange }) => {
+export const NumberInput = ({
+  defaultValue,
+  step,
+  min,
+  max,
+  required,
+  onChange,
+}) => {
   const [value, setValue] = useState(defaultValue || 0);
   return (
     <section className="number">
       <input
         type="number"
-        step="0.01"
+        step={step || "0.01"}
         required={required}
         value={value}
         onChange={(e) => {
@@ -982,14 +989,20 @@ export const FileInput = ({
   );
 };
 
-export const InputDateRange = ({ onChange }) => {
+export const InputDateRange = ({
+  dateRange: defaultRange,
+  onChange,
+  required,
+}) => {
   const dateFilterRef = useRef();
-  const [dateRange, setDateRange] = useState({
-    startDate: new Date(),
-    endDate: new Date(),
-  });
+  const [dateRange, setDateRange] = useState(
+    defaultRange || {
+      startDate: new Date(),
+      endDate: new Date(),
+    }
+  );
   const [datePickerStyle, setDatePickerStyle] = useState({});
-  const [dateFilter, setDateFilter] = useState(false);
+  const [dateFilter, setDateFilter] = useState(!!dateRange);
   const [open, setOpen] = useState(false);
   useLayoutEffect(() => {
     const {
@@ -1031,6 +1044,23 @@ export const InputDateRange = ({ onChange }) => {
             fill="#336cf9"
           />
         </svg>
+        <input
+          className="dateInput"
+          type="date"
+          style={{
+            width: "100%",
+            height: "100%",
+          }}
+          value={
+            dateFilter
+              ? moment({
+                  time: dateRange.startDate,
+                  format: "YYYY-MM-DD",
+                })
+              : ""
+          }
+          required={required}
+        />
         {dateFilter && (
           <>
             <div className="dates">

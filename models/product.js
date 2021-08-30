@@ -119,3 +119,32 @@ const refundModel = new Schema(
   { timestamps: true }
 );
 global.Refund = mongoose.model("Refund", refundModel);
+
+const couponModel = new Schema(
+  {
+    title: { type: String },
+    dscr: { type: String },
+    image: { type: String },
+    code: { type: String, required: true, unique: true },
+    type: { type: String, required: true, enum: ["percent", "flat"] },
+    amount: { type: Number, required: true },
+    maxDiscount: { type: Number, required: true },
+    threshold: { type: Number, required: true },
+    date: {
+      from: { type: Date, required: true },
+      to: { type: Date, required: true },
+    },
+    status: { type: String, default: "draft" },
+    users: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "User",
+      },
+    ],
+    terms: [{ type: String }],
+    termsUrl: { type: String },
+    validPerUser: { type: Number, default: 1 },
+  },
+  { timestamps: true }
+);
+global.Coupon = mongoose.model("Coupon", couponModel);

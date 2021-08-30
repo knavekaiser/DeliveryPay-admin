@@ -19,6 +19,7 @@ import Milestones from "./Milestones";
 import Settings, { SiteSettings } from "./Settings";
 import Notifications from "./notification";
 import Disputes, { SingleDispute } from "./Disputes";
+import Coupons from "./Coupons";
 import Users, { FullUser } from "./Users";
 import BugReport from "./BugReport";
 import {
@@ -403,6 +404,20 @@ function Dashboard({ location }) {
           </Link>
         </li>
         <li
+          className={`notifications ${
+            location.pathname.startsWith("/dashboard/coupons")
+              ? "active"
+              : undefined
+          }`}
+        >
+          <Link to="/dashboard/coupons">
+            <div className="icon">
+              <Img src="/setting.png" />
+            </div>
+            <p className="label">Coupons</p>
+          </Link>
+        </li>
+        <li
           className={`settings ${
             location.pathname.startsWith("/dashboard/settings")
               ? "active"
@@ -569,6 +584,7 @@ function Dashboard({ location }) {
             path="/dashboard/support/ticket/:_id"
             component={SingleTicket}
           />
+          <Route path="/dashboard/coupons" component={Coupons} />
           <Route path="/dashboard/support/tickets" component={Tickets} />
           <Route
             path="/dashboard/support/workRequest"

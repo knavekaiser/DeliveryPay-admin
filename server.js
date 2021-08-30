@@ -114,6 +114,7 @@ require("./routes/data.js");
 require("./routes/userManagement.js");
 require("./routes/support.js");
 require("./routes/notifications.js");
+require("./routes/coupons.js");
 
 // notification
 app.post(

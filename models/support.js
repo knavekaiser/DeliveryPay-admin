@@ -61,6 +61,7 @@ const faqModel = new Schema(
   {
     ques: { type: String, required: true },
     ans: { type: String, required: true },
+    audience: { type: String },
     author: { type: Schema.Types.ObjectId, required: true, ref: "Admin" },
   },
   { timestamps: true }

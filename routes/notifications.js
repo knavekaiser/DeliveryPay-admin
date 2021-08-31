@@ -109,13 +109,7 @@ app.put(
     const { _id } = req.body;
     if (ObjectId.isValid(_id)) {
       const notification = await Notification.findOne({ _id });
-      User.aggregate([
-        {
-          $project: {
-            _id: 1,
-          },
-        },
-      ]).then((users) => {
+      User.aggregate([{ $project: { _id: 1 } }]).then((users) => {
         users.forEach((user, i) => {
           notify(user._id, JSON.stringify({ ...notification._doc }), "User");
         });

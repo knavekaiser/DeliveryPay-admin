@@ -80,7 +80,6 @@ function Users({ history, location, match }) {
       .then((data) => {
         if (data.code === "ok") {
           setUsers(data.users);
-          console.log(data.users);
           setTotal(data.total);
         } else {
           setMsg(

@@ -49,10 +49,31 @@ app.post(
         .save()
         .then((dbRes) => {
           res.json({ code: "ok", coupon: dbRes });
+          Product.aggregate([{ $group: { _id: "$user" } }]).then((sellers) => {
+            sellers.forEach((seller, i) => {
+              notify(
+                seller._id,
+                JSON.stringify({
+                  title: "New Campaign!",
+                  body:
+                    "A new Campaign has started. be a part of the campaign now.",
+                  link: `/account/myShop/campaigns`,
+                  ...(dbRes.image && { image: dbRes.image }),
+                }),
+                "User"
+              );
+            });
+          });
         })
         .catch((err) => {
-          console.log(err);
-          res.status(500).json({ code: 500, message: "Database error." });
+          if (err.code === 11000) {
+            res
+              .status(409)
+              .json({ code: 409, message: "Code already exists." });
+          } else {
+            console.log(err);
+            res.status(500).json({ code: 500, message: "Database error." });
+          }
         });
     } else {
       res.status(400).json({

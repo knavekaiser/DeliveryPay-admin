@@ -1002,7 +1002,7 @@ export const InputDateRange = ({
     }
   );
   const [datePickerStyle, setDatePickerStyle] = useState({});
-  const [dateFilter, setDateFilter] = useState(!!dateRange);
+  const [dateFilter, setDateFilter] = useState(!!defaultRange);
   const [open, setOpen] = useState(false);
   useLayoutEffect(() => {
     const {
@@ -1010,11 +1010,12 @@ export const InputDateRange = ({
       y,
       width,
       x,
+      bottom,
     } = dateFilterRef.current.getBoundingClientRect();
     setDatePickerStyle({
       position: "fixed",
-      top: height + y + 4,
-      right: window.innerWidth - x - width,
+      top: Math.min(height + y + 4, window.innerHeight - 350),
+      right: Math.min(window.innerWidth - x - width, window.innerWidth - 335),
     });
   }, [open]);
   useEffect(() => {
@@ -1060,6 +1061,7 @@ export const InputDateRange = ({
               : ""
           }
           required={required}
+          onChange={() => {}}
         />
         {dateFilter && (
           <>

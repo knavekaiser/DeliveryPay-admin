@@ -33,6 +33,7 @@ const adminModel = new Schema(
             type: Date,
             default: new Date().getTime() + 1000 * 60 * 60 * 24 * 14,
           },
+          thumb: { type: String },
         },
         { timestamps: true }
       ),
@@ -104,6 +105,7 @@ const userModel = new Schema(
             type: Date,
             default: new Date().getTime() + 1000 * 60 * 60 * 24 * 14,
           },
+          thumb: { type: String },
         },
         { timestamps: true }
       ),

@@ -135,12 +135,8 @@ const couponModel = new Schema(
       to: { type: Date, required: true },
     },
     status: { type: String, default: "draft" },
-    users: [
-      {
-        type: Schema.Types.ObjectId,
-        ref: "User",
-      },
-    ],
+    users: [{ type: Schema.Types.ObjectId, ref: "User" }],
+    sellers: [{ type: Schema.Types.ObjectId, ref: "User" }],
     terms: [{ type: String }],
     termsUrl: { type: String },
     validPerUser: { type: Number, default: 1 },

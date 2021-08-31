@@ -156,7 +156,7 @@ function Coupons({ history, location, pathname }) {
             <th>Threshold</th>
             <th>Status</th>
             <th>Used</th>
-            <th>Date Range</th>
+            <th>Validity</th>
             <th>Actions</th>
           </tr>
         </thead>
@@ -178,8 +178,8 @@ function Coupons({ history, location, pathname }) {
               <td>{item.status}</td>
               <td>{item.users?.length}</td>
               <td>
-                <Moment format="DD/MM/YY">{item.date?.from}</Moment>-
-                <Moment format="DD/MM/YY">{item.date?.to}</Moment>
+                <Moment format="DD MMM YY">{item.date?.from}</Moment>-
+                <Moment format="DD MMM YY">{item.date?.to}</Moment>
               </td>
               <td>
                 <Actions>
@@ -329,7 +329,6 @@ const CouponForm = ({ edit, onSuccess }) => {
   const submit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    console.log(date);
     const imgLink = (await UploadFiles({ files: thumb, setMsg }))?.[0] || null;
     if (thumb.length && !imgLink.length) {
       return;
@@ -376,6 +375,16 @@ const CouponForm = ({ edit, onSuccess }) => {
         setLoading(false);
         if (data.code === "ok") {
           onSuccess?.(data.coupon);
+        } else if (data.code === 409) {
+          setMsg(
+            <>
+              <button onClick={() => setMsg(null)}>Okay</button>
+              <div>
+                <Err_svg />
+                <h4>Coupon code already exists. Enter a different code.</h4>
+              </div>
+            </>
+          );
         } else {
           setMsg(
             <>
@@ -483,7 +492,7 @@ const CouponForm = ({ edit, onSuccess }) => {
           />
         </section>
         <section className="_date">
-          <label>Date</label>
+          <label>Validity</label>
           <InputDateRange
             dateRange={{
               startDate: new Date(date.from),

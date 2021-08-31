@@ -35,7 +35,7 @@ function Milestones({ history, location, pathname }) {
       format: "YYYY-MM-DD",
     });
     const endDate = moment({
-      time: dateRange?.endDate.setHours(24, 0, 0, 0),
+      time: dateRange?.endDate?.setHours(24, 0, 0, 0),
       format: "YYYY-MM-DD",
     });
     fetch(

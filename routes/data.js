@@ -6,7 +6,7 @@ app.get(
       start: new Date(new Date().setDate(1)).setHours(0, 0, 0, 0),
       end: new Date(
         new Date(new Date().setMonth(new Date().getMonth() + 1)).setDate(1)
-      ).setHours(0, 0, 0, 0),
+      ).setHours(24, 0, 0, 0),
     };
     Promise.all([
       User.aggregate([
@@ -46,15 +46,16 @@ app.get(
         ]) => {
           res.json({
             code: "ok",
-            totalBalance: totalBalance[0].balance,
+            totalBalance: totalBalance[0]?.balance,
             recentTrans,
             activeMilestones,
             activeDisputes,
-            transactionThisMonth: transactionThisMonth[0].total,
+            transactionThisMonth: transactionThisMonth[0]?.total,
           });
         }
       )
       .catch((err) => {
+        console.log(err);
         res.status(500).json({ code: 500, message: "someting went wrong" });
       });
   }
@@ -360,6 +361,7 @@ app.post(
         res.json({ code: "ok", users: dbRes });
       })
       .catch((err) => {
+        console.log(err);
         res.status(500).json({ code: 500, message: "Database error" });
       });
   }
